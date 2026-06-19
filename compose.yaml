@@ -1,0 +1,59 @@
+services:
+  # PostgreSQL Database for Servicename
+  postgres-servicename:
+    extends:
+      file: compose.base.yaml
+      service: postgres-servicename
+
+  # RabbitMQ for Servicename
+  rabbitmq-servicename:
+    extends:
+      file: compose.base.yaml
+      service: rabbitmq-servicename
+
+  # MailHog for local email testing
+  mailhog:
+    extends:
+      file: compose.base.yaml
+      service: mailhog
+
+  # DbGate - Database Administration Tool
+  dbgate:
+    extends:
+      file: compose.base.yaml
+      service: dbgate
+
+  # SonarQube for code quality analysis
+  sonar:
+    extends:
+      file: compose.base.yaml
+      service: sonar
+
+  # Prometheus for metrics collection
+  prometheus:
+    extends:
+      file: compose.base.yaml
+      service: prometheus
+
+  # Grafana for metrics visualization
+  grafana:
+    extends:
+      file: compose.base.yaml
+      service: grafana
+
+networks:
+  servicename-network:
+    name: foundation-servicename-network-dev
+    external: false
+
+volumes:
+  postgres_servicename_data:
+    name: iqkv_servicename_postgres_data_dev
+  rabbitmq_servicename_data:
+    name: iqkv_servicename_rabbitmq_data_dev
+  dbgate_servicename_data:
+    name: iqkv_servicename_dbgate_data_dev
+  servicename_logs:
+    name: servicename_logs_dev
+  servicename_tmp:
+    name: servicename_tmp_dev

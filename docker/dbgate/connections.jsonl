@@ -1,0 +1,2 @@
+{"_id":"postgres-servicename","engine":"postgres@dbgate-plugin-postgres","server":"postgres-servicename","port":5432,"user":"svc_servicename_dba","password":"svc_servicename_dba","database":"servicename","displayName":"PostgreSQL - Servicename"}
+{"_id":"rabbitmq-management","engine":"rabbitmq@dbgate-plugin-rabbitmq","server":"rabbitmq-servicename","port":15672,"user":"svc_servicename_rmq","password":"svc_servicename_rmq","displayName":"RabbitMQ - Servicename"}

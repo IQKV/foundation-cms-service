@@ -1,0 +1,243 @@
+services:
+  # PostgreSQL Database for Servicename - Local Development
+  postgres-servicename:
+    image: postgres:17-alpine
+    container_name: foundation-servicename-postgres-dev
+    environment:
+      POSTGRES_DB: servicename
+      POSTGRES_USER: svc_servicename_dba
+      POSTGRES_PASSWORD: svc_servicename_dba
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_servicename_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-servicename.sql:/docker-entrypoint-initdb.d/init-servicename.sql:ro
+    networks:
+      - servicename-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U svc_servicename_dba -d servicename -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.track=all
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+
+  # RabbitMQ for Servicename - Local Development
+  rabbitmq-servicename:
+    image: rabbitmq:3.13-management-alpine
+    container_name: foundation-servicename-rabbitmq-dev
+    environment:
+      RABBITMQ_DEFAULT_USER: svc_servicename_rmq
+      RABBITMQ_DEFAULT_PASS: svc_servicename_rmq
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,info}] disk_free_limit 2147483648
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_servicename_data:/var/lib/rabbitmq
+    networks:
+      - servicename-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # MailHog for local email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: foundation-servicename-mailhog-dev
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - servicename-network
+    restart: unless-stopped
+
+  # DbGate - Database Administration Tool
+  dbgate:
+    image: dbgate/dbgate:5.3.3
+    container_name: foundation-servicename-dbgate-dev
+    environment:
+      WEB_ROOT: /
+      LOGINS: "1"
+    ports:
+      - "3100:3000" # DbGate Web UI (port 3100 to avoid conflict with Grafana)
+    volumes:
+      - ./docker/dbgate/connections.jsonl:/root/.dbgate/connections.jsonl:ro
+      - dbgate_servicename_data:/root/.dbgate
+    networks:
+      - servicename-network
+    depends_on:
+      postgres-servicename:
+        condition: service_healthy
+      rabbitmq-servicename:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Servicename - Local Development
+  servicename:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: builder
+    image: iqkv/servicename:dev
+    container_name: foundation-servicename-dev
+    environment:
+      # Spring Configuration
+      SPRING_PROFILES_ACTIVE: local
+
+      # Database Configuration
+      DB_HOST: postgres-servicename
+      DB_PORT: 5432
+      DB_NAME: servicename
+      DB_USERNAME: svc_servicename_dba
+      DB_PASSWORD: svc_servicename_dba
+
+      # RabbitMQ Configuration
+      RABBITMQ_HOST: rabbitmq-servicename
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: svc_servicename_rmq
+      RABBITMQ_PASSWORD: svc_servicename_rmq
+
+      # Mail Configuration (MailHog)
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_FROM: noreply@iqkv.dev
+      MAIL_REPLY_TO: ""
+
+      # Observability
+      OTEL_SERVICE_NAME: servicename
+      OTEL_RESOURCE_ATTRIBUTES: service.name=servicename,service.version=1.0.0,deployment.environment=dev
+
+      # JVM Configuration
+      JAVA_OPTS: >-
+        -Xms256m
+        -Xmx512m
+        -XX:+UseG1GC
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Djava.security.egd=file:/dev/./urandom
+    ports:
+      - "8080:8080" # Servicename API
+      - "8081:8081" # Actuator / management
+    depends_on:
+      postgres-servicename:
+        condition: service_healthy
+      rabbitmq-servicename:
+        condition: service_healthy
+    networks:
+      - servicename-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    restart: unless-stopped
+    volumes:
+      - servicename_logs:/app/logs
+      - servicename_tmp:/app/tmp
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 768M
+        reservations:
+          cpus: "0.25"
+          memory: 384M
+
+  # SonarQube for code quality analysis
+  sonar:
+    image: sonarqube:25.3.0.104237-community
+    container_name: foundation-servicename-sonarqube-dev
+    environment:
+      - SONAR_FORCEAUTHENTICATION=false
+    ports:
+      - "127.0.0.1:9001:9000"
+      - "127.0.0.1:9000:9000"
+    networks:
+      - servicename-network
+    restart: unless-stopped
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: foundation-servicename-prometheus-dev
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - servicename-network
+    restart: unless-stopped
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: foundation-servicename-grafana-dev
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - servicename-network
+    restart: unless-stopped
+
+networks:
+  servicename-network:
+    driver: bridge
+    name: foundation-servicename-network-dev
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_servicename_data:
+    name: iqkv_servicename_postgres_data_dev
+    driver: local
+  rabbitmq_servicename_data:
+    name: iqkv_servicename_rabbitmq_data_dev
+    driver: local
+  dbgate_servicename_data:
+    name: iqkv_servicename_dbgate_data_dev
+    driver: local
+  servicename_logs:
+    name: servicename_logs_dev
+    driver: local
+  servicename_tmp:
+    name: servicename_tmp_dev
+    driver: local
