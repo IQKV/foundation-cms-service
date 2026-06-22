@@ -151,7 +151,7 @@ public class PageServiceImpl implements PageService {
   public List<PageDtos.PageResponse> getPublishedByLocale(final Locale locale) {
     final List<Page> pages = pageMapper.findPublished();
     final List<Page> processedPages = new ArrayList<>();
-    for (Page page : pages) {
+    for (final Page page : pages) {
       processedPages.add(applyFallbackToPage(page, locale));
     }
     return processedPages.stream()
