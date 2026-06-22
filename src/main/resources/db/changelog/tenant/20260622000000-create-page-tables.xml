@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260622000000-create-page-table" author="iqkv">
+        <createTable tableName="page">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="parent_id" type="UUID"/>
+            <column name="template" type="VARCHAR(50)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="page"
+                                 baseColumnNames="parent_id"
+                                 constraintName="fk_page_parent"
+                                 referencedTableName="page"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20260622000001-create-page-translations-table" author="iqkv">
+        <createTable tableName="page_translations">
+            <column name="page_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locale" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT"/>
+            <column name="seo_title" type="VARCHAR(255)"/>
+            <column name="seo_description" type="TEXT"/>
+            <column name="seo_open_graph_title" type="VARCHAR(255)"/>
+            <column name="seo_open_graph_description" type="TEXT"/>
+            <column name="seo_canonical_url" type="VARCHAR(500)"/>
+        </createTable>
+
+        <addPrimaryKey tableName="page_translations"
+                       columnNames="page_id, locale"
+                       constraintName="pk_page_translations"/>
+
+        <addForeignKeyConstraint baseTableName="page_translations"
+                                 baseColumnNames="page_id"
+                                 constraintName="fk_page_translations_page"
+                                 referencedTableName="page"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

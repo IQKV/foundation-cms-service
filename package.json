@@ -1,5 +1,5 @@
 {
-    "name": "@iqkv/foundation-microservice-project-layout",
+    "name": "@iqkv/foundation-cms-service",
     "version": "0.0.0",
     "private": true,
     "description": "Provide an optional Git commit hooks.",
@@ -21,7 +21,7 @@
         "cz-conventional-changelog": "^3.3.0",
         "glob": "^13.0.6",
         "husky": "9.1.7",
-        "lint-staged": "^17.0.7",
+        "lint-staged": "^17.0.8",
         "oxfmt": "^0.55.0",
         "oxlint": "^1.70.0",
         "oxlint-tsgolint": "^0.23.0",

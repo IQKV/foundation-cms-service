@@ -4,7 +4,7 @@
 
 spring:
   application:
-    name: foundation-servicename-service
+    name: foundation-cms-service
   datasource:
     url: jdbc:postgresql://${iqkv.db.host}:${iqkv.db.port}/${iqkv.db.name}
     username: ${iqkv.db.username}
@@ -60,14 +60,14 @@ iqkv:
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
-    name: ${DB_NAME:servicename}
-    username: ${DB_USERNAME:svc_servicename_dba}
-    password: ${DB_PASSWORD:svc_servicename_dba}
+    name: ${DB_NAME:cms}
+    username: ${DB_USERNAME:svc_cms_dba}
+    password: ${DB_PASSWORD:svc_cms_dba}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:svc_servicename_rmq}
-    password: ${RABBITMQ_PASSWORD:svc_servicename_rmq}
+    username: ${RABBITMQ_USERNAME:svc_cms_rmq}
+    password: ${RABBITMQ_PASSWORD:svc_cms_rmq}
   messaging:
     rabbitmq:
       # Disabled by default; enabled per-profile (local, sit, uat, prd)
@@ -78,13 +78,25 @@ iqkv:
     # How often the plan catalog cache is refreshed (ISO-8601 duration)
     plan-catalog-refresh-interval: ${PLAN_CATALOG_REFRESH_INTERVAL:PT10M}
   liquibase:
-    change-log: db/changelog/db.changelog-master.xml
+    system-change-log: db/changelog/system/db.changelog-master.xml
+    tenant-change-log: db/changelog/tenant/master.xml
   platform:
     # Platform-wide operational mode: MULTI_TENANT (default) or SINGLE_TENANT
     rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}
   auth:
     jwt:
       public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
+  tenancy:
+    # Default tenant key for SINGLE_TENANT mode (optional)
+    # If not provided, will be resolved from database or auto-generated
+    # Format: 8-character NanoID using alphabet [a-z0-9]
+    # Example: abc12345
+    default-tenant-key: ${DEFAULT_TENANT_KEY:platform}
+    # Display name for the default tenant in SINGLE_TENANT mode
+    default-tenant-name: ${DEFAULT_TENANT_NAME:Acme Corp.}
+    schema-prefix: t_
+    default-schema: public
+    provisioning-timeout: PT10M
 
 git:
   build_time: "@git.build.time@"

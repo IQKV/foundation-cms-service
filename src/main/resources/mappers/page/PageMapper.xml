@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqkv.foundation.cms.page.PageMapper">
+
+    <resultMap id="pageResultMap" type="com.iqkv.foundation.cms.page.Page">
+        <id property="id" column="id"/>
+        <result property="slug" column="slug"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="template" column="template"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <collection property="translations" ofType="com.iqkv.foundation.cms.page.PageTranslation">
+            <result property="pageId" column="page_id"/>
+            <result property="locale" column="locale"/>
+            <result property="title" column="title"/>
+            <result property="content" column="content"/>
+            <result property="seoTitle" column="seo_title"/>
+            <result property="seoDescription" column="seo_description"/>
+            <result property="seoOpenGraphTitle" column="seo_open_graph_title"/>
+            <result property="seoOpenGraphDescription" column="seo_open_graph_description"/>
+            <result property="seoCanonicalUrl" column="seo_canonical_url"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.iqkv.foundation.cms.page.Page">
+        INSERT INTO page (id, slug, parent_id, template, status, created_at, updated_at)
+        VALUES (#{id}, #{slug}, #{parentId}, #{template}, #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <insert id="insertTranslation" parameterType="com.iqkv.foundation.cms.page.PageTranslation">
+        INSERT INTO page_translations (page_id, locale, title, content, seo_title, seo_description, seo_open_graph_title, seo_open_graph_description, seo_canonical_url)
+        VALUES (#{pageId}, #{locale}, #{title}, #{content}, #{seoTitle}, #{seoDescription}, #{seoOpenGraphTitle}, #{seoOpenGraphDescription}, #{seoCanonicalUrl})
+    </insert>
+
+    <update id="update" parameterType="com.iqkv.foundation.cms.page.Page">
+        UPDATE page
+        SET slug = #{slug},
+        parent_id = #{parentId},
+        template = #{template},
+        status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTranslations">
+        DELETE FROM page_translations
+        WHERE page_id = #{pageId}
+    </delete>
+
+    <delete id="delete">
+        DELETE FROM page
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="pageResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+        t.page_id, t.locale, t.title, t.content, t.seo_title, t.seo_description, t.seo_open_graph_title, t.seo_open_graph_description, t.seo_canonical_url
+        FROM page p
+        LEFT JOIN page_translations t ON p.id = t.page_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="findBySlug" resultMap="pageResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+        t.page_id, t.locale, t.title, t.content, t.seo_title, t.seo_description, t.seo_open_graph_title, t.seo_open_graph_description, t.seo_canonical_url
+        FROM page p
+        LEFT JOIN page_translations t ON p.id = t.page_id
+        WHERE p.slug = #{slug}
+    </select>
+
+    <select id="findAll" resultMap="pageResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+        t.page_id, t.locale, t.title, t.content, t.seo_title, t.seo_description, t.seo_open_graph_title, t.seo_open_graph_description, t.seo_canonical_url
+        FROM (
+        SELECT id, slug, parent_id, template, status, created_at, updated_at
+        FROM page
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+        ) p
+        LEFT JOIN page_translations t ON p.id = t.page_id
+        ORDER BY p.created_at DESC
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM page
+    </select>
+
+    <select id="findPublished" resultMap="pageResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+        t.page_id, t.locale, t.title, t.content, t.seo_title, t.seo_description, t.seo_open_graph_title, t.seo_open_graph_description, t.seo_canonical_url
+        FROM page p
+        INNER JOIN page_translations t ON p.id = t.page_id
+        WHERE p.status = 'PUBLISHED'
+        ORDER BY p.created_at DESC
+    </select>
+
+    <select id="findPublishedBySlug" resultMap="pageResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+        t.page_id, t.locale, t.title, t.content, t.seo_title, t.seo_description, t.seo_open_graph_title, t.seo_open_graph_description, t.seo_canonical_url
+        FROM page p
+        LEFT JOIN page_translations t ON p.id = t.page_id
+        WHERE p.slug = #{slug}
+        AND p.status = 'PUBLISHED'
+    </select>
+
+</mapper>

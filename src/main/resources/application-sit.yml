@@ -17,9 +17,9 @@ logging:
 
 iqkv:
   db:
-    host: ${DB_HOST:postgres-servicename}
+    host: ${DB_HOST:postgres-cms}
   rabbitmq:
-    host: ${RABBITMQ_HOST:rabbitmq-servicename}
+    host: ${RABBITMQ_HOST:rabbitmq-cms}
   messaging:
     rabbitmq:
       enabled: true

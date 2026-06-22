@@ -1,15 +1,15 @@
 services:
-  # PostgreSQL Database for Servicename
-  postgres-servicename:
+  # PostgreSQL Database for Cms
+  postgres-cms:
     extends:
       file: compose.base.yaml
-      service: postgres-servicename
+      service: postgres-cms
 
-  # RabbitMQ for Servicename
-  rabbitmq-servicename:
+  # RabbitMQ for Cms
+  rabbitmq-cms:
     extends:
       file: compose.base.yaml
-      service: rabbitmq-servicename
+      service: rabbitmq-cms
 
   # MailHog for local email testing
   mailhog:
@@ -23,25 +23,25 @@ services:
       file: compose.base.yaml
       service: dbgate
 
-  # Servicename - Full platform run including build phase
-  servicename:
+  # Cms - Full platform run including build phase
+  cms:
     extends:
       file: compose.base.yaml
-      service: servicename
+      service: cms
 
 networks:
-  servicename-network:
-    name: foundation-servicename-network-dev
+  cms-network:
+    name: foundation-cms-network-dev
     external: false
 
 volumes:
-  postgres_servicename_data:
-    name: iqkv_servicename_postgres_data_dev
-  rabbitmq_servicename_data:
-    name: iqkv_servicename_rabbitmq_data_dev
-  dbgate_servicename_data:
-    name: iqkv_servicename_dbgate_data_dev
-  servicename_logs:
-    name: servicename_logs_dev
-  servicename_tmp:
-    name: servicename_tmp_dev
+  postgres_cms_data:
+    name: iqkv_cms_postgres_data_dev
+  rabbitmq_cms_data:
+    name: iqkv_cms_rabbitmq_data_dev
+  dbgate_cms_data:
+    name: iqkv_cms_dbgate_data_dev
+  cms_logs:
+    name: cms_logs_dev
+  cms_tmp:
+    name: cms_tmp_dev
