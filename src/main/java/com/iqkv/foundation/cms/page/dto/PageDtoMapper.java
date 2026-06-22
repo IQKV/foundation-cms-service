@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.iqkv.foundation.cms.page.Page;
 import com.iqkv.foundation.cms.page.PageTranslation;
+import com.iqkv.foundation.cms.page.dto.PageSummaryRow;
 
 public final class PageDtoMapper {
 
@@ -50,6 +51,19 @@ public final class PageDtoMapper {
         page.getCreatedAt(),
         page.getUpdatedAt(),
         translationResponses
+    );
+  }
+
+  public static PageDtos.PageSummaryResponse toSummaryResponse(final PageSummaryRow row) {
+    return new PageDtos.PageSummaryResponse(
+        row.getId(),
+        row.getSlug(),
+        row.getParentId(),
+        row.getTemplate(),
+        row.getStatus(),
+        row.getTitle(),
+        row.getCreatedAt(),
+        row.getUpdatedAt()
     );
   }
 

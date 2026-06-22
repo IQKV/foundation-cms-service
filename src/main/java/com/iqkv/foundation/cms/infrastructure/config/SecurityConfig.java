@@ -77,6 +77,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui.html").permitAll()
             .requestMatchers("/api/v1/cms/pages/**").permitAll()
             .requestMatchers("/api/v1/cms/admin/**").hasAuthority("PLATFORM_ADMIN")
+            .requestMatchers("/api/v1/cms/tenant/**").hasAnyAuthority("TENANT_OWNER", "ADMIN")
             .anyRequest().authenticated()
         )
         .oauth2ResourceServer(oauth2 -> oauth2

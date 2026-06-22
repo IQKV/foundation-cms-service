@@ -17,6 +17,7 @@
 package com.iqkv.foundation.cms.page;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 import com.iqkv.foundation.cms.page.dto.PageDtos;
@@ -51,6 +52,25 @@ public class AdminPageRestResource {
 
   public AdminPageRestResource(final PageService pageService) {
     this.pageService = pageService;
+  }
+
+  @GetMapping("/hierarchy")
+  @Operation(
+      summary = "List pages for hierarchy picker",
+      description = "Returns a flat list of all CMS pages for the tenant (id, slug, parentId, en-US title). "
+          + "Intended for use in the parent-page selector on the admin create/edit forms.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Hierarchy items returned"),
+      @ApiResponse(responseCode = "403", description = "Forbidden")
+  })
+  public ResponseEntity<List<PageDtos.PageHierarchyItem>> getHierarchy(
+      @Parameter(description = "8-char tenant key") @PathVariable final String tenantKey) {
+    try {
+      TenantContext.setCurrentTenant(tenantKey);
+      return ResponseEntity.ok(pageService.getHierarchyItems());
+    } finally {
+      TenantContext.clear();
+    }
   }
 
   @PostMapping
@@ -119,14 +139,14 @@ public class AdminPageRestResource {
   }
 
   @GetMapping
-  @Operation(summary = "List all pages", description = "Retrieves a paginated list of all CMS pages for the specified tenant.")
-  public ResponseEntity<PageDtos.PageListResponse> getAll(
+  @Operation(summary = "List all pages (summary)", description = "Retrieves a paginated summary list of all CMS pages for the specified tenant, including the en-US fallback title.")
+  public ResponseEntity<PageDtos.PageSummaryListResponse> getAllSummary(
       @Parameter(description = "8-char tenant key") @PathVariable final String tenantKey,
       @RequestParam(defaultValue = "20") final int limit,
       @RequestParam(defaultValue = "0") final int offset) {
     try {
       TenantContext.setCurrentTenant(tenantKey);
-      return ResponseEntity.ok(pageService.getAll(limit, offset));
+      return ResponseEntity.ok(pageService.getAllSummary(limit, offset));
     } finally {
       TenantContext.clear();
     }

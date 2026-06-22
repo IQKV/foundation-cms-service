@@ -36,6 +36,10 @@ public interface PageService {
 
   PageDtos.PageListResponse getAll(int limit, int offset);
 
+  PageDtos.PageSummaryListResponse getAllSummary(int limit, int offset);
+
+  List<PageDtos.PageHierarchyItem> getHierarchyItems();
+
   List<PageDtos.PageResponse> getPublishedByLocale(Locale locale);
 
 }

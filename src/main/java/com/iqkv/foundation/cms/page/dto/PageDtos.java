@@ -80,4 +80,36 @@ public final class PageDtos {
       List<PageResponse> items,
       long totalElements) {
   }
+
+  /**
+   * Lightweight summary used by the admin list view.
+   * Includes the en-US fallback title so the grid can display a human-readable name
+   * without embedding all translation content.
+   */
+  public record PageSummaryResponse(
+      UUID id,
+      String slug,
+      UUID parentId,
+      String template,
+      PageStatus status,
+      String title,
+      LocalDateTime createdAt,
+      LocalDateTime updatedAt) {
+  }
+
+  public record PageSummaryListResponse(
+      List<PageSummaryResponse> items,
+      long totalElements) {
+  }
+
+  /**
+   * Lightweight item used to build a parent-page picker in the admin UI.
+   * Returns all pages for the tenant with their en-US fallback title.
+   */
+  public record PageHierarchyItem(
+      UUID id,
+      String slug,
+      UUID parentId,
+      String title) {
+  }
 }

@@ -84,6 +84,45 @@
         ORDER BY p.created_at DESC
     </select>
 
+    <resultMap id="pageSummaryResultMap" type="com.iqkv.foundation.cms.page.dto.PageSummaryRow">
+        <id property="id" column="id"/>
+        <result property="slug" column="slug"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="template" column="template"/>
+        <result property="status" column="status"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="title" column="title"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findAllSummary" resultMap="pageSummaryResultMap">
+        SELECT p.id, p.slug, p.parent_id, p.template, p.status, p.created_at, p.updated_at,
+               t.title
+        FROM (
+            SELECT id, slug, parent_id, template, status, created_at, updated_at
+            FROM page
+            ORDER BY created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+        ) p
+        LEFT JOIN page_translations t ON p.id = t.page_id AND LOWER(t.locale) = 'en-us'
+        ORDER BY p.created_at DESC
+    </select>
+
+    <resultMap id="pageHierarchyResultMap" type="com.iqkv.foundation.cms.page.dto.PageHierarchyRow">
+        <id property="id" column="id"/>
+        <result property="slug" column="slug"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+    </resultMap>
+
+    <select id="findAllForHierarchy" resultMap="pageHierarchyResultMap">
+        SELECT p.id, p.slug, p.parent_id, t.title
+        FROM page p
+        LEFT JOIN page_translations t ON p.id = t.page_id AND LOWER(t.locale) = 'en-us'
+        ORDER BY p.slug ASC
+    </select>
+
     <select id="countAll" resultType="long">
         SELECT COUNT(*) FROM page
     </select>

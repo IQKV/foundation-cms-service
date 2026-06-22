@@ -148,6 +148,29 @@ public class PageServiceImpl implements PageService {
 
   @Override
   @Transactional(readOnly = true)
+  public PageDtos.PageSummaryListResponse getAllSummary(final int limit, final int offset) {
+    final List<PageDtos.PageSummaryResponse> items = pageMapper.findAllSummary(limit, offset)
+        .stream()
+        .map(PageDtoMapper::toSummaryResponse)
+        .toList();
+    final long totalElements = pageMapper.countAll();
+    return new PageDtos.PageSummaryListResponse(items, totalElements);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<PageDtos.PageHierarchyItem> getHierarchyItems() {
+    return pageMapper.findAllForHierarchy().stream()
+        .map(row -> new PageDtos.PageHierarchyItem(
+            row.getId(),
+            row.getSlug(),
+            row.getParentId(),
+            row.getTitle()))
+        .toList();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public List<PageDtos.PageResponse> getPublishedByLocale(final Locale locale) {
     final List<Page> pages = pageMapper.findPublished();
     final List<Page> processedPages = new ArrayList<>();

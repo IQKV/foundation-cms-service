@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.iqkv.foundation.cms.page.dto.PageHierarchyRow;
+import com.iqkv.foundation.cms.page.dto.PageSummaryRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -41,6 +43,10 @@ public interface PageMapper {
   Optional<Page> findBySlug(@Param("slug") String slug);
 
   List<Page> findAll(@Param("limit") int limit, @Param("offset") int offset);
+
+  List<PageSummaryRow> findAllSummary(@Param("limit") int limit, @Param("offset") int offset);
+
+  List<PageHierarchyRow> findAllForHierarchy();
 
   long countAll();
 
