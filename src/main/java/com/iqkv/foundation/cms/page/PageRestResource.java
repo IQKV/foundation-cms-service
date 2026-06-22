@@ -46,7 +46,8 @@ public class PageRestResource {
   }
 
   @GetMapping
-  @Operation(summary = "Get published pages", description = "Retrieves a list of all published CMS pages for a specific locale (from Accept-Language header or ?lang=xxx or ?locale=xxx), with en-US fallback.")
+  @Operation(summary = "Get published pages",
+             description = "Retrieves a list of all published CMS pages for a specific locale (from Accept-Language header or ?lang=xxx or ?locale=xxx), with en-US fallback.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Published pages retrieved successfully")
   })
@@ -64,7 +65,8 @@ public class PageRestResource {
   }
 
   @GetMapping("/{slug}")
-  @Operation(summary = "Get page by slug", description = "Retrieves a single published CMS page by its slug, with en-US fallback for translations (uses Accept-Language header or ?lang=xxx or ?locale=xxx).")
+  @Operation(summary = "Get page by slug",
+             description = "Retrieves a single published CMS page by its slug, with en-US fallback for translations (uses Accept-Language header or ?lang=xxx or ?locale=xxx).")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Page retrieved successfully"),
       @ApiResponse(responseCode = "404", description = "Page not found")

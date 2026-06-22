@@ -22,6 +22,7 @@ public class PageNotFoundException extends RuntimeException {
   public PageNotFoundException(final UUID id) {
     super("Page not found: " + id);
   }
+
   public PageNotFoundException(final String slug) {
     super("Page not found: " + slug);
   }

@@ -8,7 +8,7 @@
         <version>0.24.12</version>
     </parent>
     <groupId>com.iqkv</groupId>
-    <artifactId>foundation-cms</artifactId>
+    <artifactId>foundation-cms-service</artifactId>
     <version>0.0.0-SNAPSHOT</version>
     <name>Cms Backend</name>
     <description>API for implementing cms.</description>
@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.run.jvmArguments>-Duser.timezone=UTC</spring-boot.run.jvmArguments>
-        <checkstyle.skip>true</checkstyle.skip>
+        <checkstyle.skip>false</checkstyle.skip>
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>
         <jacoco.skip>true</jacoco.skip>
         <start-class>com.iqkv.foundation.cms.CmsApplication</start-class>
