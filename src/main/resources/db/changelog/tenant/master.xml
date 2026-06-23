@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="20260622000000-create-page-tables.xml"/>
-    <include file="20260623000000-insert-sample-pages.xml"/>
+    <include file="db/changelog/tenant/20260622000000-create-page-tables.xml"/>
+    <include file="db/changelog/tenant/20260623000000-insert-sample-pages.xml"/>
 
 </databaseChangeLog>
