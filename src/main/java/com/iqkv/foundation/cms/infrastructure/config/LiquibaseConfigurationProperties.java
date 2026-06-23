@@ -16,9 +16,8 @@
 
 package com.iqkv.foundation.cms.infrastructure.config;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;

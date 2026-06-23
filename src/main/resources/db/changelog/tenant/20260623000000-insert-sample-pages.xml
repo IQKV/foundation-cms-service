@@ -44,7 +44,7 @@
         <!-- Insert translations for English -->
         <insert tableName="page_translations">
             <column name="page_id" valueComputed="(SELECT id FROM page WHERE slug = 'home')"/>
-            <column name="locale" value="en"/>
+            <column name="locale" value="en-US"/>
             <column name="title" value="Welcome to our Platform"/>
             <column name="content" value="&lt;h1&gt;Welcome!&lt;/h1&gt;&lt;p&gt;This is your home page. Edit this content to match your brand.&lt;/p&gt;"/>
             <column name="seo_title" value="Home - Our Platform"/>
@@ -53,7 +53,7 @@
 
         <insert tableName="page_translations">
             <column name="page_id" valueComputed="(SELECT id FROM page WHERE slug = 'about-us')"/>
-            <column name="locale" value="en"/>
+            <column name="locale" value="en-US"/>
             <column name="title" value="About Us"/>
             <column name="content" value="&lt;h1&gt;About Us&lt;/h1&gt;&lt;p&gt;Tell your story here. Let your customers know who you are and what you stand for.&lt;/p&gt;"/>
             <column name="seo_title" value="About Us - Our Platform"/>
@@ -62,7 +62,7 @@
 
         <insert tableName="page_translations">
             <column name="page_id" valueComputed="(SELECT id FROM page WHERE slug = 'contact')"/>
-            <column name="locale" value="en"/>
+            <column name="locale" value="en-US"/>
             <column name="title" value="Contact Us"/>
             <column name="content" value="&lt;h1&gt;Get in Touch&lt;/h1&gt;&lt;p&gt;We'd love to hear from you. Use this page to provide your contact information.&lt;/p&gt;"/>
             <column name="seo_title" value="Contact Us - Our Platform"/>
@@ -71,7 +71,7 @@
 
         <insert tableName="page_translations">
             <column name="page_id" valueComputed="(SELECT id FROM page WHERE slug = 'privacy-policy')"/>
-            <column name="locale" value="en"/>
+            <column name="locale" value="en-US"/>
             <column name="title" value="Privacy Policy"/>
             <column name="content" value="&lt;h1&gt;Privacy Policy&lt;/h1&gt;&lt;p&gt;Add your privacy policy here. This is important for legal compliance.&lt;/p&gt;"/>
             <column name="seo_title" value="Privacy Policy - Our Platform"/>
@@ -80,7 +80,7 @@
 
         <insert tableName="page_translations">
             <column name="page_id" valueComputed="(SELECT id FROM page WHERE slug = 'terms-of-service')"/>
-            <column name="locale" value="en"/>
+            <column name="locale" value="en-US"/>
             <column name="title" value="Terms of Service"/>
             <column name="content" value="&lt;h1&gt;Terms of Service&lt;/h1&gt;&lt;p&gt;Add your terms of service here. This outlines the rules for using your platform.&lt;/p&gt;"/>
             <column name="seo_title" value="Terms of Service - Our Platform"/>
