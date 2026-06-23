@@ -59,6 +59,14 @@ public class TenantLiquibaseRunner implements ApplicationRunner {
     log.info("Running system schema migrations");
     runMigrations("public", SYSTEM_CHANGELOG);
     log.info("System schema migrations complete");
+
+    if (liquibaseProps.demoTenants() != null && !liquibaseProps.demoTenants().isEmpty()) {
+      log.info("Running tenant schema migrations for demo tenants: {}", liquibaseProps.demoTenants());
+      for (final String tenantKey : liquibaseProps.demoTenants()) {
+        runMigrationsForTenant(tenantKey);
+      }
+      log.info("Demo tenant schema migrations complete");
+    }
   }
 
   public void runMigrationsForTenant(final String tenantKey) throws Exception {

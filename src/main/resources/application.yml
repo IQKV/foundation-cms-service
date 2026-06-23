@@ -80,6 +80,7 @@ iqkv:
   liquibase:
     system-change-log: db/changelog/system/db.changelog-master.xml
     tenant-change-log: db/changelog/tenant/master.xml
+    demo-tenants: []
   platform:
     # Platform-wide operational mode: MULTI_TENANT (default) or SINGLE_TENANT
     rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}

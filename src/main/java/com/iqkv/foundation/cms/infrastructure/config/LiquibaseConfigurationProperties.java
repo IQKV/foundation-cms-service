@@ -16,6 +16,8 @@
 
 package com.iqkv.foundation.cms.infrastructure.config;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -26,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 public record LiquibaseConfigurationProperties(
     @NotBlank String systemChangeLog,
     @NotBlank String tenantChangeLog,
-    String contexts
+    String contexts,
+    List<String> demoTenants
 ) {
 }
