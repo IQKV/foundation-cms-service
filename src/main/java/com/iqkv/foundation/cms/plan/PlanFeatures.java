@@ -40,6 +40,10 @@ import java.util.Map;
  *
  * <p>{@code maxUsers} and {@code maxProjects} use {@code 0} to mean "unlimited".
  *
+ * <p>{@code pricingModel} is an optional string carrying the billing pricing mode
+ * ({@code "FLAT"} or {@code "PER_SEAT"}). {@code null} means the billing service has not
+ * yet been updated; treat as {@code FLAT}.
+ *
  * <p>Usage example — quota enforcement and feature check at write time:
  * <pre>
  *   final PlanFeatures f = planCatalogCache.forPlan(request.getHeader("X-Plan-Code"));
@@ -52,13 +56,14 @@ import java.util.Map;
 public record PlanFeatures(
     int maxUsers,
     int maxProjects,
-    Map<String, PlanFeature> features
+    Map<String, PlanFeature> features,
+    String pricingModel
 ) {
 
   /**
    * Safe fallback when the plan code is unknown or the cache is empty.
    */
-  public static final PlanFeatures NONE = new PlanFeatures(1, 1, Collections.emptyMap());
+  public static final PlanFeatures NONE = new PlanFeatures(1, 1, Collections.emptyMap(), null);
 
   public PlanFeatures {
     features = features != null ? Collections.unmodifiableMap(features) : Collections.emptyMap();
@@ -79,5 +84,14 @@ public record PlanFeatures(
     }
     final PlanFeature feature = features.get(code);
     return feature != null && "true".equalsIgnoreCase(feature.value());
+  }
+
+  /**
+   * Returns {@code true} if the plan uses per-seat pricing.
+   * Falls back to {@code false} (flat) when {@code pricingModel} is absent — safe for
+   * existing plans that pre-date the per-seat billing feature.
+   */
+  public boolean isPerSeat() {
+    return "PER_SEAT".equalsIgnoreCase(pricingModel);
   }
 }
