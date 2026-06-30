@@ -4,11 +4,11 @@ This guide reflects the current deployment shape of `foundation-cms-service` as 
 
 ## Deployment Modes
 
-| Mode | Entry Point | What Runs | Typical Use |
-| ---- | ----------- | --------- | ----------- |
-| Local IDE / CLI | `compose.yaml` + `local` profile | PostgreSQL, RabbitMQ, MailHog, DbGate, SonarQube, Prometheus, Grafana | Day-to-day development |
-| Local Container Stack | `compose.container.yaml` | CMS service container plus PostgreSQL, RabbitMQ, MailHog, DbGate | End-to-end local validation |
-| SIT / UAT / PRD | Spring profile + external infra | CMS service connected to managed PostgreSQL and RabbitMQ | Cluster deployment |
+| Mode                  | Entry Point                      | What Runs                                                             | Typical Use                 |
+| --------------------- | -------------------------------- | --------------------------------------------------------------------- | --------------------------- |
+| Local IDE / CLI       | `compose.yaml` + `local` profile | PostgreSQL, RabbitMQ, MailHog, DbGate, SonarQube, Prometheus, Grafana | Day-to-day development      |
+| Local Container Stack | `compose.container.yaml`         | CMS service container plus PostgreSQL, RabbitMQ, MailHog, DbGate      | End-to-end local validation |
+| SIT / UAT / PRD       | Spring profile + external infra  | CMS service connected to managed PostgreSQL and RabbitMQ              | Cluster deployment          |
 
 ## Runtime Topology
 
@@ -22,12 +22,12 @@ This guide reflects the current deployment shape of `foundation-cms-service` as 
 
 ## Profiles
 
-| Profile | Liquibase | Demo Data | RabbitMQ Publishing | Notes |
-| ------- | --------- | --------- | ------------------- | ----- |
-| `local` | enabled | `platform`, `acme0001`, `demo0001` | enabled | Exposes all actuator endpoints and debug logging |
-| `sit` | enabled | `platform`, `acme0001`, `demo0001` | enabled | Uses SIT service names by default |
-| `uat` | enabled | `platform`, `acme0001`, `demo0001` | enabled | All connection values come from env vars |
-| `prd` | enabled | `platform` only | enabled | Swagger disabled, health details hidden, no demo context |
+| Profile | Liquibase | Demo Data                          | RabbitMQ Publishing | Notes                                                    |
+| ------- | --------- | ---------------------------------- | ------------------- | -------------------------------------------------------- |
+| `local` | enabled   | `platform`, `acme0001`, `demo0001` | enabled             | Exposes all actuator endpoints and debug logging         |
+| `sit`   | enabled   | `platform`, `acme0001`, `demo0001` | enabled             | Uses SIT service names by default                        |
+| `uat`   | enabled   | `platform`, `acme0001`, `demo0001` | enabled             | All connection values come from env vars                 |
+| `prd`   | enabled   | `platform` only                    | enabled             | Swagger disabled, health details hidden, no demo context |
 
 ## Local Development
 
@@ -99,28 +99,28 @@ The service reads its runtime configuration from environment variables mapped in
 
 ### Core Variables
 
-| Variable | Default | Required In | Purpose |
-| -------- | ------- | ----------- | ------- |
-| `DB_HOST` | `localhost` | all envs | PostgreSQL host |
-| `DB_PORT` | `5432` | all envs | PostgreSQL port |
-| `DB_NAME` | `cms` | all envs | Database name |
-| `DB_USERNAME` | `svc_cms_dba` | all envs | Database user |
-| `DB_PASSWORD` | `svc_cms_dba` | all envs | Database password |
-| `RABBITMQ_HOST` | `localhost` | all envs | RabbitMQ host |
-| `RABBITMQ_PORT` | `5672` | all envs | RabbitMQ port |
-| `RABBITMQ_USERNAME` | `svc_cms_rmq` | all envs | RabbitMQ user |
-| `RABBITMQ_PASSWORD` | `svc_cms_rmq` | all envs | RabbitMQ password |
-| `JWT_PUBLIC_KEY_PATH` | `classpath:keys/public.pem` | all envs | Public key for validating IAM-issued JWTs |
-| `BILLING_SERVICE_URI` | `http://foundation-billing-service` | env-specific | Billing service base URL for plan catalog refresh |
-| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M` | optional | Plan catalog refresh cadence |
+| Variable                        | Default                             | Required In  | Purpose                                           |
+| ------------------------------- | ----------------------------------- | ------------ | ------------------------------------------------- |
+| `DB_HOST`                       | `localhost`                         | all envs     | PostgreSQL host                                   |
+| `DB_PORT`                       | `5432`                              | all envs     | PostgreSQL port                                   |
+| `DB_NAME`                       | `cms`                               | all envs     | Database name                                     |
+| `DB_USERNAME`                   | `svc_cms_dba`                       | all envs     | Database user                                     |
+| `DB_PASSWORD`                   | `svc_cms_dba`                       | all envs     | Database password                                 |
+| `RABBITMQ_HOST`                 | `localhost`                         | all envs     | RabbitMQ host                                     |
+| `RABBITMQ_PORT`                 | `5672`                              | all envs     | RabbitMQ port                                     |
+| `RABBITMQ_USERNAME`             | `svc_cms_rmq`                       | all envs     | RabbitMQ user                                     |
+| `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | all envs     | RabbitMQ password                                 |
+| `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | all envs     | Public key for validating IAM-issued JWTs         |
+| `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | env-specific | Billing service base URL for plan catalog refresh |
+| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | optional     | Plan catalog refresh cadence                      |
 
 ### Platform / Tenancy Variables
 
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
-| `ROLLOUT_MODE` | `MULTI_TENANT` | Platform-wide mode; must match other platform services |
-| `DEFAULT_TENANT_KEY` | `platform` | Default tenant key for `SINGLE_TENANT` mode |
-| `DEFAULT_TENANT_NAME` | `Acme Corp.` | Display name for the default tenant |
+| Variable              | Default        | Purpose                                                |
+| --------------------- | -------------- | ------------------------------------------------------ |
+| `ROLLOUT_MODE`        | `MULTI_TENANT` | Platform-wide mode; must match other platform services |
+| `DEFAULT_TENANT_KEY`  | `platform`     | Default tenant key for `SINGLE_TENANT` mode            |
+| `DEFAULT_TENANT_NAME` | `Acme Corp.`   | Display name for the default tenant                    |
 
 ## Environment Preparation
 
@@ -164,21 +164,21 @@ For SIT, UAT, and production-style deployments:
 - Ensure `JWT_PUBLIC_KEY_PATH` points to the IAM public key material used by the platform
 - Keep `ROLLOUT_MODE` aligned with IAM, Billing, and Gateway
 - In production, expect:
-  - Swagger UI disabled
-  - OpenAPI docs disabled
-  - Actuator health details hidden
+    - Swagger UI disabled
+    - OpenAPI docs disabled
+    - Actuator health details hidden
 
 ## Health and Operations
 
 Primary operational endpoints:
 
-| Endpoint | Purpose |
-| -------- | ------- |
-| `GET /actuator/health` | Overall health |
-| `GET /actuator/health/liveness` | Liveness probe |
-| `GET /actuator/health/readiness` | Readiness probe |
-| `GET /actuator/info` | Build and app metadata |
-| `GET /actuator/prometheus` | Prometheus scrape endpoint |
+| Endpoint                         | Purpose                    |
+| -------------------------------- | -------------------------- |
+| `GET /actuator/health`           | Overall health             |
+| `GET /actuator/health/liveness`  | Liveness probe             |
+| `GET /actuator/health/readiness` | Readiness probe            |
+| `GET /actuator/info`             | Build and app metadata     |
+| `GET /actuator/prometheus`       | Prometheus scrape endpoint |
 
 Profile behavior:
 
