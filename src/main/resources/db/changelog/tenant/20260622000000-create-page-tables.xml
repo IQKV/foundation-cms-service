@@ -27,6 +27,11 @@
                                  constraintName="fk_page_parent"
                                  referencedTableName="page"
                                  referencedColumnNames="id"/>
+        
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="page" constraintName="fk_page_parent"/>
+            <dropTable tableName="page"/>
+        </rollback>
     </changeSet>
 
     <changeSet id="20260622000001-create-page-translations-table" author="iqkv">
@@ -57,6 +62,12 @@
                                  constraintName="fk_page_translations_page"
                                  referencedTableName="page"
                                  referencedColumnNames="id"/>
+        
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="page_translations" constraintName="fk_page_translations_page"/>
+            <dropPrimaryKey tableName="page_translations" constraintName="pk_page_translations"/>
+            <dropTable tableName="page_translations"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
