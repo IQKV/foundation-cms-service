@@ -99,20 +99,20 @@ The service reads its runtime configuration from environment variables mapped in
 
 ### Core Variables
 
-| Variable                        | Default                             | Required In  | Purpose                                           |
-| ------------------------------- | ----------------------------------- | ------------ | ------------------------------------------------- |
-| `DB_HOST`                       | `localhost`                         | all envs     | PostgreSQL host                                   |
-| `DB_PORT`                       | `5432`                              | all envs     | PostgreSQL port                                   |
-| `DB_NAME`                       | `cms`                               | all envs     | Database name                                     |
-| `DB_USERNAME`                   | `svc_cms_dba`                       | all envs     | Database user                                     |
-| `DB_PASSWORD`                   | `svc_cms_dba`                       | all envs     | Database password                                 |
-| `RABBITMQ_HOST`                 | `localhost`                         | all envs     | RabbitMQ host                                     |
-| `RABBITMQ_PORT`                 | `5672`                              | all envs     | RabbitMQ port                                     |
-| `RABBITMQ_USERNAME`             | `svc_cms_rmq`                       | all envs     | RabbitMQ user                                     |
-| `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | all envs     | RabbitMQ password                                 |
-| `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | all envs     | Public key for validating IAM-issued JWTs         |
-| `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | env-specific | Billing service base URL for plan catalog refresh |
-| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | optional     | Plan catalog refresh cadence                      |
+| Variable                        | Default                             | Required In | Purpose                                           |
+| ------------------------------- | ----------------------------------- | ----------- | ------------------------------------------------- |
+| `DB_HOST`                       | `localhost`                         | all envs    | PostgreSQL host                                   |
+| `DB_PORT`                       | `5432`                              | all envs    | PostgreSQL port                                   |
+| `DB_NAME`                       | `cms`                               | all envs    | Database name                                     |
+| `DB_USERNAME`                   | `svc_cms_dba`                       | all envs    | Database user                                     |
+| `DB_PASSWORD`                   | `svc_cms_dba`                       | all envs    | Database password                                 |
+| `RABBITMQ_HOST`                 | `localhost`                         | all envs    | RabbitMQ host                                     |
+| `RABBITMQ_PORT`                 | `5672`                              | all envs    | RabbitMQ port                                     |
+| `RABBITMQ_USERNAME`             | `svc_cms_rmq`                       | all envs    | RabbitMQ user                                     |
+| `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | all envs    | RabbitMQ password                                 |
+| `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | all envs    | Public key for validating IAM-issued JWTs         |
+| `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | all envs    | Billing service base URL for plan catalog refresh |
+| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | optional    | Plan catalog refresh cadence                      |
 
 ### Platform / Tenancy Variables
 
@@ -145,6 +145,10 @@ RABBITMQ_USERNAME=svc_cms_rmq
 RABBITMQ_PASSWORD=svc_cms_rmq
 JWT_PUBLIC_KEY_PATH=classpath:keys/public.pem
 ROLLOUT_MODE=MULTI_TENANT
+DEFAULT_TENANT_KEY=platform
+DEFAULT_TENANT_NAME=Acme Corp.
+BILLING_SERVICE_URI=http://foundation-billing-service
+PLAN_CATALOG_REFRESH_INTERVAL=PT10M
 ```
 
 For `uat` and `prd`, do not rely on local defaults. Supply explicit values for database, RabbitMQ, JWT public key, billing URL, and rollout mode.

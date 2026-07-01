@@ -93,20 +93,23 @@ docker compose up -d
 
 ## Environment Variables
 
-| Variable              | Default                     | Description                                            |
-| --------------------- | --------------------------- | ------------------------------------------------------ |
-| `DB_HOST`             | `localhost`                 | PostgreSQL host                                        |
-| `DB_PORT`             | `5432`                      | PostgreSQL port                                        |
-| `DB_NAME`             | `cms`                       | Database name                                          |
-| `DB_USERNAME`         | `svc_cms_dba`               | Database user                                          |
-| `DB_PASSWORD`         | `svc_cms_dba`               | Database password                                      |
-| `RABBITMQ_HOST`       | `localhost`                 | RabbitMQ host                                          |
-| `RABBITMQ_PORT`       | `5672`                      | RabbitMQ AMQP port                                     |
-| `RABBITMQ_USERNAME`   | `svc_cms_rmq`               | RabbitMQ user                                          |
-| `RABBITMQ_PASSWORD`   | `svc_cms_rmq`               | RabbitMQ password                                      |
-| `JWT_PUBLIC_KEY_PATH` | `classpath:keys/public.pem` | RS256 public key (from IAM)                            |
-| `ROLLOUT_MODE`        | `MULTI_TENANT`              | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT`       |
-| `MESSAGING_ENABLED`   | `true`                      | Toggle RabbitMQ publishing (set `false` for local dev) |
+| Variable                        | Default                             | Description                                       |
+| ------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| `DB_HOST`                       | `localhost`                         | PostgreSQL host                                   |
+| `DB_PORT`                       | `5432`                              | PostgreSQL port                                   |
+| `DB_NAME`                       | `cmsservice`                        | Database name                                     |
+| `DB_USERNAME`                   | `svc_cms_dba`                       | Database user                                     |
+| `DB_PASSWORD`                   | `svc_cms_dba`                       | Database password                                 |
+| `RABBITMQ_HOST`                 | `localhost`                         | RabbitMQ host                                     |
+| `RABBITMQ_PORT`                 | `5672`                              | RabbitMQ AMQP port                                |
+| `RABBITMQ_USERNAME`             | `svc_cms_rmq`                       | RabbitMQ user                                     |
+| `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | RabbitMQ password                                 |
+| `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | Public key for validating IAM-issued JWTs         |
+| `ROLLOUT_MODE`                  | `MULTI_TENANT`                      | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT`  |
+| `DEFAULT_TENANT_KEY`            | `platform`                          | Default tenant key for `SINGLE_TENANT` mode       |
+| `DEFAULT_TENANT_NAME`           | `Acme Corp.`                        | Display name for the default tenant               |
+| `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | Billing service base URL for plan catalog refresh |
+| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | Plan catalog cache refresh cadence (ISO-8601)     |
 
 > Copy `.env.example` to `.env.local` / `.env.uat` / `.env.prd` and fill in values per environment.
 
@@ -139,7 +142,7 @@ docker build -t iqkv/foundation-cms-service:latest .
 docker compose -f compose.container.yaml up -d
 ```
 
-Note: The root `compose.yaml` is for development purposes only and is self-contained. It starts all required external services (PostgreSQL with pre-initialized `cms` database, RabbitMQ) but excludes the CMS Service itself, which should be run locally in your IDE for a better development experience.
+Note: The root `compose.yaml` is for development purposes only and is self-contained. It starts all required external services (PostgreSQL with pre-initialized `cmsservice` database, RabbitMQ) but excludes the CMS Service itself, which should be run locally in your IDE for a better development experience.
 
 ## Monitoring
 

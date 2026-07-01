@@ -106,17 +106,23 @@ docker compose up -d
 
 ## Environment Variables
 
-| Variable            | Default       | Description        |
-| ------------------- | ------------- | ------------------ |
-| `DB_HOST`           | `localhost`   | PostgreSQL host    |
-| `DB_PORT`           | `5432`        | PostgreSQL port    |
-| `DB_NAME`           | `cms`         | Database name      |
-| `DB_USERNAME`       | `svc_cms_dba` | Database user      |
-| `DB_PASSWORD`       | `svc_cms_dba` | Database password  |
-| `RABBITMQ_HOST`     | `localhost`   | RabbitMQ host      |
-| `RABBITMQ_PORT`     | `5672`        | RabbitMQ AMQP port |
-| `RABBITMQ_USERNAME` | `svc_cms_rmq` | RabbitMQ user      |
-| `RABBITMQ_PASSWORD` | `svc_cms_rmq` | RabbitMQ password  |
+| Variable                        | Default                             | Description                                       |
+| ------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| `DB_HOST`                       | `localhost`                         | PostgreSQL host                                   |
+| `DB_PORT`                       | `5432`                              | PostgreSQL port                                   |
+| `DB_NAME`                       | `cms`                               | Database name                                     |
+| `DB_USERNAME`                   | `svc_cms_dba`                       | Database user                                     |
+| `DB_PASSWORD`                   | `svc_cms_dba`                       | Database password                                 |
+| `RABBITMQ_HOST`                 | `localhost`                         | RabbitMQ host                                     |
+| `RABBITMQ_PORT`                 | `5672`                              | RabbitMQ AMQP port                                |
+| `RABBITMQ_USERNAME`             | `svc_cms_rmq`                       | RabbitMQ user                                     |
+| `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | RabbitMQ password                                 |
+| `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | Public key for validating IAM-issued JWTs         |
+| `ROLLOUT_MODE`                  | `MULTI_TENANT`                      | Platform mode: `MULTI_TENANT` or `SINGLE_TENANT`  |
+| `DEFAULT_TENANT_KEY`            | `platform`                          | Default tenant key for `SINGLE_TENANT` mode       |
+| `DEFAULT_TENANT_NAME`           | `Acme Corp.`                        | Display name for the default tenant               |
+| `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | Billing service base URL for plan catalog refresh |
+| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | Plan catalog cache refresh cadence (ISO-8601)     |
 
 Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
 

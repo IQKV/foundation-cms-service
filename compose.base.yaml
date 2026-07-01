@@ -4,7 +4,7 @@ services:
     image: postgres:17-alpine
     container_name: foundation-cms-postgres-dev
     environment:
-      POSTGRES_DB: cms
+      POSTGRES_DB: cmsservice
       POSTGRES_USER: svc_cms_dba
       POSTGRES_PASSWORD: svc_cms_dba
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
@@ -17,7 +17,7 @@ services:
     networks:
       - cms-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U svc_cms_dba -d cms -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U svc_cms_dba -d cmsservice -h localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -117,7 +117,7 @@ services:
       # Database Configuration
       DB_HOST: postgres-cms
       DB_PORT: 5432
-      DB_NAME: cms
+      DB_NAME: cmsservice
       DB_USERNAME: svc_cms_dba
       DB_PASSWORD: svc_cms_dba
 
@@ -134,6 +134,18 @@ services:
       MAIL_PASSWORD: ""
       MAIL_FROM: noreply@iqkv.dev
       MAIL_REPLY_TO: ""
+
+      # Security / JWT
+      JWT_PUBLIC_KEY_PATH: classpath:keys/public.pem
+
+      # Platform / Tenancy
+      ROLLOUT_MODE: MULTI_TENANT
+      DEFAULT_TENANT_KEY: platform
+      DEFAULT_TENANT_NAME: Acme Corp.
+
+      # Billing Service Integration
+      BILLING_SERVICE_URI: http://foundation-billing-service
+      PLAN_CATALOG_REFRESH_INTERVAL: PT10M
 
       # Observability
       OTEL_SERVICE_NAME: cms

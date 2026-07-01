@@ -60,7 +60,7 @@ iqkv:
   db:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}
-    name: ${DB_NAME:cms}
+    name: ${DB_NAME:cmsservice}
     username: ${DB_USERNAME:svc_cms_dba}
     password: ${DB_PASSWORD:svc_cms_dba}
   rabbitmq:
