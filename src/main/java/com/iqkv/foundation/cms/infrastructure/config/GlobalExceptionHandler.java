@@ -21,7 +21,7 @@ import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.UUID;
 
-import com.iqkv.foundation.cms.shared.exception.PlanFeatureNotAvailableException;
+import com.iqkv.foundation.entitlement.plan.PlanFeatureNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
