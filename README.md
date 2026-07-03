@@ -122,7 +122,7 @@ docker compose up -d
 | `DEFAULT_TENANT_KEY`            | `platform`                          | Default tenant key for `SINGLE_TENANT` mode       |
 | `DEFAULT_TENANT_NAME`           | `Acme Corp.`                        | Display name for the default tenant               |
 | `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | Billing service base URL for plan catalog refresh |
-| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | Plan catalog cache refresh cadence (ISO-8601)     |
+| `BILLING_PLAN_REFRESH_INTERVAL` | `PT10M`                             | Plan catalog cache refresh cadence (ISO-8601)     |
 
 Copy `.env.example` to `.env.local` (or `.env.uat` / `.env.prd`) and fill in production values.
 

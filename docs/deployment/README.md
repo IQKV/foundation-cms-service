@@ -112,7 +112,7 @@ The service reads its runtime configuration from environment variables mapped in
 | `RABBITMQ_PASSWORD`             | `svc_cms_rmq`                       | all envs    | RabbitMQ password                                 |
 | `JWT_PUBLIC_KEY_PATH`           | `classpath:keys/public.pem`         | all envs    | Public key for validating IAM-issued JWTs         |
 | `BILLING_SERVICE_URI`           | `http://foundation-billing-service` | all envs    | Billing service base URL for plan catalog refresh |
-| `PLAN_CATALOG_REFRESH_INTERVAL` | `PT10M`                             | optional    | Plan catalog refresh cadence                      |
+| `BILLING_PLAN_REFRESH_INTERVAL` | `PT10M`                             | optional    | Plan catalog refresh cadence                      |
 
 ### Platform / Tenancy Variables
 
@@ -148,7 +148,7 @@ ROLLOUT_MODE=MULTI_TENANT
 DEFAULT_TENANT_KEY=platform
 DEFAULT_TENANT_NAME=Acme Corp.
 BILLING_SERVICE_URI=http://foundation-billing-service
-PLAN_CATALOG_REFRESH_INTERVAL=PT10M
+BILLING_PLAN_REFRESH_INTERVAL=PT10M
 ```
 
 For `uat` and `prd`, do not rely on local defaults. Supply explicit values for database, RabbitMQ, JWT public key, billing URL, and rollout mode.

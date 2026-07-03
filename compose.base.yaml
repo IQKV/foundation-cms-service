@@ -145,7 +145,7 @@ services:
 
       # Billing Service Integration
       BILLING_SERVICE_URI: http://foundation-billing-service
-      PLAN_CATALOG_REFRESH_INTERVAL: PT10M
+      BILLING_PLAN_REFRESH_INTERVAL: PT10M
 
       # Observability
       OTEL_SERVICE_NAME: cms
