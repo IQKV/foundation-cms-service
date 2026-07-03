@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.iqkv</groupId>
         <artifactId>boot-parent-pom</artifactId>
-        <version>0.24.16</version>
+        <version>0.24.17</version>
     </parent>
     <groupId>com.iqkv</groupId>
     <artifactId>foundation-cms-service</artifactId>
@@ -96,6 +96,19 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iqkv</groupId>
+            <artifactId>foundation-tenancy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iqkv</groupId>
+            <artifactId>foundation-audit-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iqkv</groupId>
+            <artifactId>foundation-audit-spi</artifactId>
         </dependency>
 
         <!-- Testing -->

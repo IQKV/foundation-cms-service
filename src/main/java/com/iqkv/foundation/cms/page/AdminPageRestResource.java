@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iqkv.foundation.cms.page.dto.PageDtos;
-import com.iqkv.foundation.cms.tenancy.TenantContext;
+import com.iqkv.foundation.tenancy.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
