@@ -11,7 +11,7 @@
     <artifactId>foundation-cms-service</artifactId>
     <version>0.0.0-SNAPSHOT</version>
     <name>Cms Backend</name>
-    <description>API for implementing cms.</description>
+    <description>API for implementing CMS.</description>
     <developers>
 
     </developers>
@@ -23,7 +23,7 @@
         <checkstyle.skip>false</checkstyle.skip>
         <maven.gitcommitid.skip>false</maven.gitcommitid.skip>
         <jacoco.skip>true</jacoco.skip>
-        <start-class>com.iqkv.foundation.cms.CmsApplication</start-class>
+        <start-class>com.iqkv.foundation.cmsservice.CmsApplication</start-class>
     </properties>
 
     <dependencies>

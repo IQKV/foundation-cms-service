@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.iqkv.foundation.cms.page.PageMapper">
+<mapper namespace="com.iqkv.foundation.cmsservice.page.PageMapper">
 
-    <resultMap id="pageResultMap" type="com.iqkv.foundation.cms.page.Page">
+    <resultMap id="pageResultMap" type="com.iqkv.foundation.cmsservice.page.Page">
         <id property="id" column="id"/>
         <result property="slug" column="slug"/>
         <result property="parentId" column="parent_id"/>
@@ -12,7 +12,7 @@
                 typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
-        <collection property="translations" ofType="com.iqkv.foundation.cms.page.PageTranslation">
+        <collection property="translations" ofType="com.iqkv.foundation.cmsservice.page.PageTranslation">
             <result property="pageId" column="page_id"/>
             <result property="locale" column="locale"/>
             <result property="title" column="title"/>
@@ -25,17 +25,17 @@
         </collection>
     </resultMap>
 
-    <insert id="insert" parameterType="com.iqkv.foundation.cms.page.Page">
+    <insert id="insert" parameterType="com.iqkv.foundation.cmsservice.page.Page">
         INSERT INTO page (id, slug, parent_id, template, status, created_at, updated_at)
         VALUES (#{id}, #{slug}, #{parentId}, #{template}, #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler}, #{createdAt}, #{updatedAt})
     </insert>
 
-    <insert id="insertTranslation" parameterType="com.iqkv.foundation.cms.page.PageTranslation">
+    <insert id="insertTranslation" parameterType="com.iqkv.foundation.cmsservice.page.PageTranslation">
         INSERT INTO page_translations (page_id, locale, title, content, seo_title, seo_description, seo_open_graph_title, seo_open_graph_description, seo_canonical_url)
         VALUES (#{pageId}, #{locale}, #{title}, #{content}, #{seoTitle}, #{seoDescription}, #{seoOpenGraphTitle}, #{seoOpenGraphDescription}, #{seoCanonicalUrl})
     </insert>
 
-    <update id="update" parameterType="com.iqkv.foundation.cms.page.Page">
+    <update id="update" parameterType="com.iqkv.foundation.cmsservice.page.Page">
         UPDATE page
         SET slug = #{slug},
         parent_id = #{parentId},
@@ -84,7 +84,7 @@
         ORDER BY p.created_at DESC
     </select>
 
-    <resultMap id="pageSummaryResultMap" type="com.iqkv.foundation.cms.page.dto.PageSummaryRow">
+    <resultMap id="pageSummaryResultMap" type="com.iqkv.foundation.cmsservice.page.dto.PageSummaryRow">
         <id property="id" column="id"/>
         <result property="slug" column="slug"/>
         <result property="parentId" column="parent_id"/>
@@ -109,7 +109,7 @@
         ORDER BY p.created_at DESC
     </select>
 
-    <resultMap id="pageHierarchyResultMap" type="com.iqkv.foundation.cms.page.dto.PageHierarchyRow">
+    <resultMap id="pageHierarchyResultMap" type="com.iqkv.foundation.cmsservice.page.dto.PageHierarchyRow">
         <id property="id" column="id"/>
         <result property="slug" column="slug"/>
         <result property="parentId" column="parent_id"/>
