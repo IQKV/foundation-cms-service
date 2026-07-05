@@ -78,6 +78,7 @@ iqkv:
     # How often the plan catalog cache is refreshed (ISO-8601 duration)
     plan-refresh-interval: ${BILLING_PLAN_REFRESH_INTERVAL:PT10M}
   liquibase:
+    tenant-runner-enabled: true
     system-change-log: db/changelog/system/db.changelog-system.xml
     tenant-change-log: db/changelog/tenant/db.changelog-tenant.xml
     demo-tenants: []
