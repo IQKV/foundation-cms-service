@@ -1,11 +1,11 @@
 services:
-  # PostgreSQL Database for Cms
+  # PostgreSQL Database for CMS Service
   postgres-cms:
     extends:
       file: compose.base.yaml
       service: postgres-cms
 
-  # RabbitMQ for Cms
+  # RabbitMQ for CMS Service
   rabbitmq-cms:
     extends:
       file: compose.base.yaml
@@ -23,14 +23,14 @@ services:
       file: compose.base.yaml
       service: dbgate
 
-  # Cms - Full platform run including build phase
-  cms:
+  # CMS Service - Full platform run including build phase
+  cms-service:
     extends:
       file: compose.base.yaml
-      service: cms
+      service: cms-service
 
 networks:
-  cms-network:
+  cms-service-network:
     name: foundation-cms-network-dev
     external: false
 
@@ -42,6 +42,6 @@ volumes:
   dbgate_cms_data:
     name: iqkv_cms_dbgate_data_dev
   cms_logs:
-    name: cms_logs_dev
+    name: iqkv_cms_logs_dev
   cms_tmp:
-    name: cms_tmp_dev
+    name: iqkv_cms_tmp_dev

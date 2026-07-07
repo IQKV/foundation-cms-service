@@ -1,8 +1,8 @@
 services:
-  # PostgreSQL Database for Cms - Local Development
+  # PostgreSQL Database for CMS Service - Local Development
   postgres-cms:
     image: postgres:17-alpine
-    container_name: foundation-cms-postgres-dev
+    container_name: foundation-cms-service-postgres-dev
     environment:
       POSTGRES_DB: cmsservice
       POSTGRES_USER: svc_cms_dba
@@ -15,7 +15,7 @@ services:
       - postgres_cms_data:/var/lib/postgresql/data
       - ./docker/postgres/init-cms.sql:/docker-entrypoint-initdb.d/init-cms.sql:ro
     networks:
-      - cms-network
+      - cms-service-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U svc_cms_dba -d cmsservice -h localhost"]
       interval: 10s
@@ -40,10 +40,10 @@ services:
       -c min_wal_size=1GB
       -c max_wal_size=4GB
 
-  # RabbitMQ for Cms - Local Development
+  # RabbitMQ for CMS Service - Local Development
   rabbitmq-cms:
     image: rabbitmq:3.13-management-alpine
-    container_name: foundation-cms-rabbitmq-dev
+    container_name: foundation-cms-service-rabbitmq-dev
     environment:
       RABBITMQ_DEFAULT_USER: svc_cms_rmq
       RABBITMQ_DEFAULT_PASS: svc_cms_rmq
@@ -55,7 +55,7 @@ services:
     volumes:
       - rabbitmq_cms_data:/var/lib/rabbitmq
     networks:
-      - cms-network
+      - cms-service-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 30s
@@ -66,19 +66,19 @@ services:
 
   # MailHog for local email testing
   mailhog:
-    image: mailhog/mailhog:latest
-    container_name: foundation-cms-mailhog-dev
+    image: mailhog/mailhog:v1.0.1
+    container_name: foundation-cms-service-mailhog-dev
     ports:
       - "1025:1025" # SMTP
       - "8025:8025" # Web UI
     networks:
-      - cms-network
+      - cms-service-network
     restart: unless-stopped
 
   # DbGate - Database Administration Tool
   dbgate:
     image: dbgate/dbgate:5.3.3
-    container_name: foundation-cms-dbgate-dev
+    container_name: foundation-cms-service-dbgate-dev
     environment:
       WEB_ROOT: /
       LOGINS: "1"
@@ -88,7 +88,7 @@ services:
       - ./docker/dbgate/connections.jsonl:/root/.dbgate/connections.jsonl:ro
       - dbgate_cms_data:/root/.dbgate
     networks:
-      - cms-network
+      - cms-service-network
     depends_on:
       postgres-cms:
         condition: service_healthy
@@ -102,17 +102,18 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # Cms - Local Development
-  cms:
+  # CMS Service - Local Development
+  cms-service:
     build:
       context: .
       dockerfile: ./Dockerfile
       target: builder
-    image: iqkv/cms:dev
-    container_name: foundation-cms-dev
+    image: iqkv/foundation-cms-service:local
+    container_name: foundation-cms-service-dev
     environment:
       # Spring Configuration
       SPRING_PROFILES_ACTIVE: local
+      SPRING_APPLICATION_NAME: foundation-cms-service
 
       # Database Configuration
       DB_HOST: postgres-cms
@@ -148,8 +149,8 @@ services:
       BILLING_PLAN_REFRESH_INTERVAL: PT10M
 
       # Observability
-      OTEL_SERVICE_NAME: cms
-      OTEL_RESOURCE_ATTRIBUTES: service.name=cms,service.version=1.0.0,deployment.environment=dev
+      OTEL_SERVICE_NAME: foundation-cms-service
+      OTEL_RESOURCE_ATTRIBUTES: service.name=foundation-cms-service,service.version=1.0.0,deployment.environment=dev
 
       # JVM Configuration
       JAVA_OPTS: >-
@@ -160,7 +161,7 @@ services:
         -XX:MaxRAMPercentage=75.0
         -Djava.security.egd=file:/dev/./urandom
     ports:
-      - "8080:8080" # Cms API
+      - "8080:8080" # CMS Service API
       - "8081:8081" # Actuator / management
     depends_on:
       postgres-cms:
@@ -168,7 +169,7 @@ services:
       rabbitmq-cms:
         condition: service_healthy
     networks:
-      - cms-network
+      - cms-service-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
       interval: 30s
@@ -191,32 +192,32 @@ services:
   # SonarQube for code quality analysis
   sonar:
     image: sonarqube:25.3.0.104237-community
-    container_name: foundation-cms-sonarqube-dev
+    container_name: foundation-cms-service-sonarqube-dev
     environment:
       - SONAR_FORCEAUTHENTICATION=false
     ports:
       - "127.0.0.1:9001:9000"
       - "127.0.0.1:9000:9000"
     networks:
-      - cms-network
+      - cms-service-network
     restart: unless-stopped
 
   # Prometheus for metrics collection
   prometheus:
     image: prom/prometheus:latest
-    container_name: foundation-cms-prometheus-dev
+    container_name: foundation-cms-service-prometheus-dev
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
-      - cms-network
+      - cms-service-network
     restart: unless-stopped
 
   # Grafana for metrics visualization
   grafana:
     image: grafana/grafana:latest
-    container_name: foundation-cms-grafana-dev
+    container_name: foundation-cms-service-grafana-dev
     volumes:
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
     environment:
@@ -226,16 +227,16 @@ services:
     depends_on:
       - prometheus
     networks:
-      - cms-network
+      - cms-service-network
     restart: unless-stopped
 
 networks:
-  cms-network:
+  cms-service-network:
     driver: bridge
     name: foundation-cms-network-dev
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.24.0.0/16
 
 volumes:
   postgres_cms_data:
@@ -248,8 +249,8 @@ volumes:
     name: iqkv_cms_dbgate_data_dev
     driver: local
   cms_logs:
-    name: cms_logs_dev
+    name: iqkv_cms_logs_dev
     driver: local
   cms_tmp:
-    name: cms_tmp_dev
+    name: iqkv_cms_tmp_dev
     driver: local

@@ -1,2 +1,2 @@
-{"_id":"postgres-cms","engine":"postgres@dbgate-plugin-postgres","server":"postgres-cms","port":5432,"user":"svc_cms_dba","password":"svc_cms_dba","database":"cms","displayName":"PostgreSQL - Cms"}
-{"_id":"rabbitmq-management","engine":"rabbitmq@dbgate-plugin-rabbitmq","server":"rabbitmq-cms","port":15672,"user":"svc_cms_rmq","password":"svc_cms_rmq","displayName":"RabbitMQ - Cms"}
+{"_id":"postgres-cms-service","engine":"postgres@dbgate-plugin-postgres","server":"postgres-cms-service","port":5432,"user":"svc_cms_dba","password":"svc_cms_dba","database":"cmsservice","displayName":"PostgreSQL - CMS Service"}
+{"_id":"rabbitmq-cms-service","engine":"rabbitmq@dbgate-plugin-rabbitmq","server":"rabbitmq-cms-service","port":15672,"user":"svc_cms_rmq","password":"svc_cms_rmq","displayName":"RabbitMQ - CMS Service"}
