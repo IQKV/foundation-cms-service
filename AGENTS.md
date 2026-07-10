@@ -2,74 +2,92 @@
 
 ## Overview
 
-This document provides comprehensive guidelines for repository management, development workflows, and collaboration standards for Maven-based Java projects. It serves as a reference for both human developers and AI agents working with this codebase.
+This document provides guidelines for repository management, development workflows, and collaboration standards for this Maven-based Java project. It serves as a reference for both human developers and AI agents working with this codebase.
 
 ## 🏛️ Repository Structure & Organization
 
-### Tactical DDD Project Layout
+### Project Layout
 
 ```
-project-root/
-├── .github/                          # GitHub workflows and automation
-│   └── workflows/                    # CI/CD pipeline definitions
+foundation-cms-service/
+├── .github/
+│   └── workflows/
 ├── src/
 │   ├── main/
-│   │   ├── java/                     # Java source code
-│   │   │   └── com/example/project/
-│   │   │       ├── shared/           # Shared kernel (cross-cutting concerns)
-│   │   │       │   ├── domain/       # Shared domain primitives
-│   │   │       │   ├── exception/    # Common exceptions
-│   │   │       │   └── util/         # Utility classes
-│   │   │       ├── infrastructure/   # Infrastructure layer
-│   │   │       │   ├── config/       # Spring configuration
-│   │   │       │   ├── security/     # Security implementation
-│   │   │       │   ├── persistence/  # JPA repositories, adapters
-│   │   │       │   └── messaging/    # Event publishers, message brokers
-│   │   │       ├── [bounded-context-1]/  # Example: user
-│   │   │       │   ├── domain/       # Domain layer (core business logic)
-│   │   │       │   │   ├── model/    # Aggregates, entities, value objects
-│   │   │       │   │   ├── service/  # Domain services
-│   │   │       │   │   └── event/    # Domain events
-│   │   │       │   ├── application/  # Application layer
-│   │   │       │   │   ├── service/  # Application services (use cases)
-│   │   │       │   │   ├── dto/      # Data transfer objects
-│   │   │       │   │   └── port/     # Ports (interfaces for adapters)
-│   │   │       │   └── adapter/      # Adapters (interface layer)
-│   │   │       │       ├── in/       # Inbound adapters
-│   │   │       │       │   └── rest/ # REST controllers
-│   │   │       │       └── out/      # Outbound adapters
-│   │   │       │           └── persistence/ # Repository implementations
-│   │   │       ├── [bounded-context-2]/  # Example: order
-│   │   │       │   ├── domain/
-│   │   │       │   ├── application/
-│   │   │       │   └── adapter/
-│   │   │       └── Application.java  # Spring Boot main class
+│   │   ├── java/
+│   │   │   └── com/iqkv/foundation/cmsservice/
+│   │   │       ├── CmsApplication.java           # Spring Boot entry point
+│   │   │       ├── infrastructure/               # Technical cross-cutting concerns
+│   │   │       │   ├── config/                   # Spring configuration beans
+│   │   │       │   │   ├── SecurityConfig.java
+│   │   │       │   │   ├── AuthConfigurationProperties.java
+│   │   │       │   │   ├── TenancyConfigurationProperties.java
+│   │   │       │   │   ├── MyBatisConfig.java
+│   │   │       │   │   ├── RabbitMQConfig.java
+│   │   │       │   │   ├── GlobalExceptionHandler.java
+│   │   │       │   │   ├── RolloutMode.java
+│   │   │       │   │   └── AllTenantsKeyProvider.java
+│   │   │       │   ├── security/
+│   │   │       │   │   ├── CorrelationIdFilter.java
+│   │   │       │   │   └── JwtClaimNames.java
+│   │   │       │   ├── messaging/
+│   │   │       │   │   └── TenantProvisioningConsumer.java
+│   │   │       │   ├── mybatis/
+│   │   │       │   │   └── UuidTypeHandler.java
+│   │   │       │   └── persistence/
+│   │   │       ├── page/                         # CMS page bounded context (flat layout)
+│   │   │       │   ├── Page.java                 # Domain model
+│   │   │       │   ├── PageTranslation.java
+│   │   │       │   ├── PageStatus.java
+│   │   │       │   ├── PageService.java           # Service interface (port)
+│   │   │       │   ├── PageServiceImpl.java       # Service implementation
+│   │   │       │   ├── PageMapper.java            # MyBatis mapper interface
+│   │   │       │   ├── PageRestResource.java      # Public REST controller
+│   │   │       │   ├── AdminPageRestResource.java # Admin REST controller
+│   │   │       │   ├── TenantPageRestResource.java
+│   │   │       │   └── dto/
+│   │   │       │       ├── PageDtos.java          # All DTOs as nested records
+│   │   │       │       ├── PageDtoMapper.java
+│   │   │       │       ├── PageHierarchyRow.java
+│   │   │       │       └── PageSummaryRow.java
+│   │   │       ├── shared/
+│   │   │       │   ├── exception/
+│   │   │       │   │   ├── PageNotFoundException.java
+│   │   │       │   │   └── InvalidPlatformModeException.java
+│   │   │       │   └── util/
+│   │   │       └── tenancy/
+│   │   │           └── TenantExtractionFilter.java
 │   │   └── resources/
-│   │       ├── application.yml       # Base configuration
-│   │       ├── application-local.yml # Local development profile
-│   │       └── db/changelog/         # Database migrations (if using Liquibase)
+│   │       ├── application.yml           # Base configuration
+│   │       ├── application-local.yml     # Local dev profile
+│   │       ├── application-sit.yml       # SIT profile
+│   │       ├── application-uat.yml       # UAT profile
+│   │       ├── application-prd.yml       # Production profile
+│   │       ├── mappers/page/             # MyBatis XML mapper files
+│   │       ├── db/changelog/
+│   │       │   ├── system/              # System-level Liquibase migrations
+│   │       │   └── tenant/              # Per-tenant Liquibase migrations
+│   │       ├── keys/public.pem          # RSA public key for JWT verification
+│   │       ├── i18n/messages*.properties
+│   │       └── logback-spring.xml
 │   └── test/
-│       └── java/                     # Unit, integration, and architecture tests
-│           └── com/example/project/
-│               ├── [bounded-context]/
-│               │   ├── domain/       # Domain model tests
-│               │   ├── application/  # Application service tests
-│               │   └── adapter/      # Adapter tests
-│               └── architecture/     # ArchUnit tests
-├── .gitignore
-├── pom.xml                           # Maven build configuration
-├── README.md
-└── AGENTS.md                         # This file
+│       └── java/com/iqkv/foundation/cmsservice/
+│           ├── CmsApplicationTests.java
+│           ├── IntegrationTest.java       # @SpringBootTest composite annotation
+│           └── TechnicalStructureTest.java # ArchUnit onion architecture test
+├── docker/                               # Grafana, dbgate, etc.
+├── compose.yaml                          # Docker Compose for local infra
+├── pom.xml
+└── AGENTS.md
 ```
 
-**Key DDD Concepts:**
+### Architecture Notes
 
-- **Bounded Context**: Logical boundary for a specific domain model (e.g., user, order, payment)
-- **Domain Layer**: Core business logic, entities, value objects, aggregates, domain services
-- **Application Layer**: Use cases, orchestration, DTOs, ports (interfaces)
-- **Adapter Layer**: Implementation of ports (REST controllers, repository implementations)
-- **Infrastructure**: Technical concerns (config, security, persistence framework)
-- **Shared Kernel**: Common code shared across bounded contexts
+This project uses a **flat bounded-context layout** rather than deeply nested DDD subdirectories. All classes for a context (model, service, mapper, controllers, DTOs) live directly in the context package (e.g., `page/`). This is intentional — do not reorganize into `domain/`, `application/`, `adapter/` subdirectories unless explicitly instructed.
+
+The ArchUnit test (`TechnicalStructureTest`) validates the **onion architecture** with `withOptionalLayers(true)`, meaning layers are enforced when present but are not required to exist.
+
+**Multi-tenancy** is a first-class concern. Every database operation is scoped to a tenant via `TenantContext`. Liquibase runs separate migration sets per tenant (`db/changelog/tenant/`) and for the system schema (`db/changelog/system/`). The platform supports `MULTI_TENANT` and `SINGLE_TENANT` rollout modes, controlled by `iqkv.platform.rollout-mode`.
 
 ## 🤖 AI Agent Guidelines
 
@@ -99,120 +117,120 @@ verification:
 
 **NEVER create these files:**
 
-- ❌ `SUMMARY.md` - Auto-generated work summaries
-- ❌ `CHANGES.md` - Change documentation (use commit messages)
-- ❌ `REVIEW.md` - Code review summaries
-- ❌ `ANALYSIS.md` - Analysis reports (communicate directly)
+- ❌ `SUMMARY.md`
+- ❌ `CHANGES.md`
+- ❌ `REVIEW.md`
+- ❌ `ANALYSIS.md`
 - ❌ Any markdown file documenting agent work unless explicitly requested
-
-**Why:** These files create noise, clutter the repository, and provide no value. Use commit messages and direct communication instead.
 
 #### Concise vs Verbose Examples
 
 **❌ VERBOSE (Don't do this):**
 
 ```
-I have successfully completed the implementation of the new user authentication
-endpoint. Here's a comprehensive summary of everything I did:
-
-• Created a new UserAuthenticationController class
-• Implemented the login method with proper validation
-• Added JWT token generation logic
-• Created comprehensive unit tests
-• Updated the OpenAPI documentation
-
-All tests are passing successfully and the code is ready for review.
+I have successfully completed the implementation of the new page endpoint.
+Here's a comprehensive summary of everything I did: ...
 ```
 
 **✅ CONCISE (Do this):**
 
 ```
-Added user authentication endpoint with JWT token generation. Tests pass, coverage at 68%.
+Added tenant page endpoint with locale fallback. Tests pass, coverage at 68%.
 ```
 
 #### When to Be Detailed
 
 Provide detailed explanations ONLY for:
 
-1. **Complex Architecture Decisions**
-2. **Security Implications**
-3. **Breaking Changes**
-4. **Non-Obvious Technical Choices**
+1. Complex architecture decisions
+2. Security implications
+3. Breaking changes
+4. Non-obvious technical choices
 
 #### Response Templates
 
-**For Simple Changes:**
-
 ```
+# Simple change
 Changed X to Y. Tests pass.
-```
 
-**For Bug Fixes:**
-
-```
+# Bug fix
 Fixed [issue]. Root cause: [brief explanation]. Added regression test.
-```
 
-**For New Features:**
-
-```
+# New feature
 Implemented [feature]. Includes [key components]. Tests pass, coverage [X]%.
-```
 
-**For Refactoring:**
-
-```
+# Refactoring
 Refactored [component] to [improvement]. No behavior changes. Tests pass.
 ```
 
-#### Communication Principles
-
-1. **Action-Oriented**: Focus on what was done, not the process
-2. **Results-First**: State the outcome immediately
-3. **No Redundancy**: Don't repeat what's obvious from the code
-4. **No Meta-Commentary**: Don't describe your own actions
-5. **Trust the User**: They can read code; don't explain obvious changes
-6. **Verification is Brief**: "Tests pass" is sufficient
-
-### Technology Stack Context
-
-Before making recommendations, agents should understand the project's technology stack:
+### Technology Stack
 
 **Runtime & Framework**
 
-- Java 25 with modern features (records, pattern matching, text blocks, var)
-- Spring Boot 4.x
-- Maven for build management
+- Java 25 with modern features (records, pattern matching, text blocks, `var`)
+- Spring Boot (via `com.iqkv:boot-parent-pom:0.24.23` — version managed by parent POM)
+- Maven build system
 
-**Data & Caching**
+**Persistence**
 
-- Database: PostgreSQL/MySQL/H2 (check project configuration)
-- Spring Data JPA with Hibernate
-- Redis for caching (if configured)
+- PostgreSQL (production/local runtime database)
+- **MyBatis** with XML mappers — there is no Spring Data JPA / Hibernate in this project
+- Liquibase for schema migrations, split into `system/` and `tenant/` changelogs
+- H2 in-memory database for tests
+- MyBatis mapper XMLs live in `src/main/resources/mappers/`
+- `mybatis.configuration.map-underscore-to-camel-case=true` is enabled
+
+**Messaging**
+
+- RabbitMQ via `spring-boot-starter-amqp`
+- Messaging is **disabled by default** (`iqkv.messaging.rabbitmq.enabled=false`); enabled per profile (local, sit, uat, prd)
+- Inbound event: `TenantProvisioningConsumer` handles tenant lifecycle events
 
 **Security**
 
-- Spring Security
-- JWT authentication (if configured)
-- Method-level security with `@PreAuthorize`
+- Spring Security + OAuth2 Resource Server (JWT validation)
+- JWT decoded using an **RSA public key** (`keys/public.pem`), not a symmetric secret
+- Authorities extracted from JWT claim `"authorities"` (not `"roles"` or `"scope"`)
+- Stateless sessions; CSRF disabled
+- `@EnableMethodSecurity` active for `@PreAuthorize` on methods
+- Custom filters: `CorrelationIdFilter` → `TenantExtractionFilter` (ordered after `BearerTokenAuthenticationFilter`)
+- Endpoint access matrix:
+    - `/actuator/**`, `/api-docs/**`, `/swagger-ui/**` — public
+    - `/api/v1/cms/pages/**` — public (tenant-scoped reads)
+    - `/api/v1/cms/admin/**` — requires `PLATFORM_ADMIN` authority
+    - `/api/v1/cms/tenant/**` — requires `TENANT_OWNER` or `ADMIN` authority
+    - all other requests — authenticated
 
-**Testing**
+**Observability**
 
-- JUnit 5 for unit tests
-- Mockito for mocking
-- Testcontainers for integration tests (if configured)
-- ArchUnit for architecture validation
+- Spring Boot Actuator (management port **8081**, main port **8080**)
+- Prometheus metrics via `micrometer-registry-prometheus` at `/actuator/prometheus`
+- Structured JSON logs via `logstash-logback-encoder`
+- Git commit info exposed via `io.github.git-commit-id:git-commit-id-maven-plugin`
 
 **API Documentation**
 
-- SpringDoc OpenAPI 3
-- Swagger UI
+- SpringDoc OpenAPI 3 / Swagger UI
+- API docs: `GET /api-docs`
+- Swagger UI: `GET /swagger-ui.html`
 
-**Build & Deployment**
+**Testing**
 
-- Maven 3.9.0+
-- Docker (if Dockerfile present)
-- Environment profiles: local, staging, production
+- JUnit 5 + Mockito (via `spring-boot-starter-test`)
+- `spring-security-test` for security context setup
+- `mybatis-spring-boot-starter-test` for MyBatis slice tests
+- `spring-rabbit-test` for AMQP mocking
+- Testcontainers: `junit-jupiter`, `postgresql`, `rabbitmq`
+- ArchUnit (`archunit-junit5`) — architecture rules enforced in `TechnicalStructureTest`
+- `@IntegrationTest` composite annotation wraps `@SpringBootTest(classes = CmsApplication.class)`
+- JaCoCo minimum coverage: **60%** (enforced in build; `Application.class` excluded)
+- JaCoCo is **skipped by default** (`jacoco.skip=true`); enable explicitly with `-Djacoco.skip=false`
+
+**Internal Libraries (IQKV Foundation)**
+
+- `foundation-entitlement-plan-resolver-mvc` — billing plan quota enforcement
+- `foundation-tenancy` — `TenantContext`, tenant schema routing
+- `foundation-audit-model` + `foundation-audit-spi` — audit trail primitives
 
 ## 📋 Development Standards
 
@@ -228,28 +246,6 @@ main (production-ready code)
 └── rfc/* (request for comments)
 ```
 
-### Branch Naming Conventions
-
-```bash
-# Feature branches
-feature/add-user-authentication
-feature/implement-caching
-
-# Bug fixes
-bugfix/fix-null-pointer-exception
-bugfix/resolve-connection-leak
-
-# Improvements
-improvement/optimize-database-queries
-improvement/enhance-error-messages
-
-# Hotfixes
-hotfix/critical-security-patch
-
-# RFC (Request for Comments)
-rfc/new-authentication-flow
-```
-
 ### Commit Message Format (Conventional Commits)
 
 **Format:**
@@ -262,318 +258,312 @@ type(scope): subject
 [optional footer]
 ```
 
-**Allowed Types:**
+**Allowed Types:** `feat`, `fix`, `rfc`, `docs`, `style`, `improvement`, `refactor`, `perf`, `test`, `chore`, `build`, `ci`, `revert`
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `rfc`: Request for comments / architectural proposal
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `improvement`: Enhancements to existing features
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-- `build`: Build system changes
-- `ci`: CI/CD pipeline changes
-- `revert`: Reverting previous commits
-
-**Rules:**
-
-- Subject line: 6-220 characters
-- Use lowercase for type
-- Use imperative mood ("add" not "added")
-- No period at end of subject line
+**Rules:** Subject line 6–220 characters, lowercase type, imperative mood, no trailing period.
 
 **Examples:**
 
 ```bash
-feat(auth): add JWT authentication endpoint
+feat(page): add tenant page list endpoint with locale fallback
 
-fix(user): resolve null pointer in user service
+fix(tenancy): resolve context leak when tenant key not present
 
-The service was not checking for null values before
-accessing user properties.
-
-Closes #123
-
-perf(database): optimize user search query with indexes
-
-docs(readme): update installation instructions
-
-refactor(service): extract validation logic to separate class
+perf(page): add index on page slug column for faster lookups
 ```
 
 ### AI Commit Message Generation
 
-**When AI Should Generate Commit Messages:**
-
-AI agents should automatically generate and present commit messages after:
-
-- Completing multi-file changes (3+ files modified)
-- Implementing new features or bug fixes
-- Performing refactoring across multiple components
-- Making configuration or infrastructure changes
-
-**AI Workflow for Commit Message Generation:**
-
-```yaml
-after_completing_changes:
-    1. analyze_changes: "Review all modified files and understand the scope"
-    2. identify_type: "Determine the appropriate commit type"
-    3. determine_scope: "Identify the affected component"
-    4. craft_subject: "Write concise subject line (6-220 chars)"
-    5. add_body_if_needed: "Include body for complex changes"
-    6. present_to_user: "Show the generated commit message for review"
-    7. wait_for_approval: "User can accept, modify, or reject"
-```
-
-**Example Presentation:**
+After completing multi-file changes, generate and present a commit message for user approval before committing:
 
 ```
-I've completed the changes. Here's the suggested commit message:
+feat(page): add admin summary endpoint
 
+Adds paginated summary list for the admin UI with en-US fallback title.
+Includes MyBatis mapper query and DTO mapping.
 ---
-feat(auth): add JWT authentication endpoint
-
-Implements JWT-based authentication with token generation
-and validation. Includes rate limiting and comprehensive tests.
----
-
-Would you like me to use this commit message, or would you prefer to modify it?
+Accept this message?
 ```
 
 ### Code Quality Standards
 
 #### Java Code Standards (Java 25)
 
-**Use Modern Java Features:**
+**Use modern Java features:**
 
 ```java
-// Records for immutable DTOs
-public record UserDto(@NotBlank String username, @Email String email, Instant createdAt) {}
+// DTOs as nested records inside a container class (project convention)
+public final class PageDtos {
+  private PageDtos() {}
 
-// Pattern matching with switch expressions
-public String getUserRole(User user) {
-  return switch (user.getRole()) {
-    case ADMIN -> "Administrator";
-    case USER -> "Regular User";
-    default -> "Unknown";
-  };
+  public record CreatePageRequest(
+      String slug,
+      UUID parentId,
+      String template,
+      PageStatus status,
+      List<PageTranslationRequest> translations) {}
 }
 
-// Text blocks for multi-line strings
-var query = """
-  SELECT u FROM User u
-  WHERE u.email = :email
-  AND u.enabled = true
-  """;
+// Pattern matching with switch expressions
+String label = switch (page.status()) {
+  case DRAFT -> "Draft";
+  case PUBLISHED -> "Published";
+  case ARCHIVED -> "Archived";
+};
 
-// var for local variables (when type is obvious)
-var users = userRepository.findAll();
+// var for local variables when type is obvious
+var pages = pageMapper.findAllSummary(limit, offset);
 ```
 
-**Import Order (Checkstyle Enforced):**
+**Constructor injection (no @Autowired, no @RequiredArgsConstructor in this codebase — use explicit constructors):**
+
+```java
+@Service
+public class PageServiceImpl implements PageService {
+
+  private final PageMapper pageMapper;
+
+  public PageServiceImpl(final PageMapper pageMapper) {
+    this.pageMapper = pageMapper;
+  }
+}
+```
+
+**Import order (Checkstyle enforced):**
 
 ```java
 // 1. Static imports (alphabetically sorted)
 import static org.assertj.core.api.Assertions.assertThat;
 
 // 2. Standard Java/Jakarta packages (alphabetically sorted)
-import jakarta.validation.Valid;
-import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
+
 // 3. Third-party packages (alphabetically sorted)
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 ```
 
-**Import Rules:**
+**Import rules:**
 
-```yaml
-import_formatting:
-    - "Separate each group with a blank line"
-    - "Sort imports alphabetically within each group"
-    - "No wildcard imports (import java.util.*) - use explicit imports"
-    - "No unused imports"
-    - "Package and import statements must not be line-wrapped"
+- No wildcard imports — explicit only
+- No unused imports
+- Alphabetical within each group, groups separated by blank line
+- No line-wrapping on import/package statements
 
-checkstyle_modules:
-    AvoidStarImport:
-        description: "Prohibits wildcard imports (import java.util.*)"
-        enforcement: "Build fails on star imports"
-        rationale: "Explicit imports improve code clarity and prevent naming conflicts"
+#### MyBatis Patterns
 
-    UnusedImports:
-        description: "Detects and removes unused import statements"
-        enforcement: "Build fails on unused imports"
-```
-
-**Service Layer Pattern:**
+SQL queries go in XML mapper files under `src/main/resources/mappers/<context>/`. The Java mapper interface lives in the bounded-context package alongside the domain model.
 
 ```java
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class UserService {
-
-  private final UserRepository userRepository;
-
-  @Transactional
-  public UserDto createUser(UserCreateCommand command) {
-    log.info("Creating user: {}", command.username());
-
-    var user = User.builder().username(command.username()).email(command.email()).build();
-
-    var savedUser = userRepository.save(user);
-    return UserMapper.toDto(savedUser);
-  }
+// Mapper interface in page package
+@Mapper
+public interface PageMapper {
+  List<Page> findAll(@Param("limit") int limit, @Param("offset") int offset);
+  Optional<Page> findBySlug(@Param("slug") String slug);
+  void insert(Page page);
+  void update(Page page);
+  void deleteById(@Param("id") UUID id);
 }
 ```
 
-**REST Controller Pattern:**
+```xml
+<!-- src/main/resources/mappers/page/PageMapper.xml -->
+<mapper namespace="com.iqkv.foundation.cmsservice.page.PageMapper">
+  <select id="findBySlug" resultType="com.iqkv.foundation.cmsservice.page.Page">
+    SELECT id, slug, parent_id, template, status, created_at, updated_at
+    FROM pages
+    WHERE slug = #{slug}
+  </select>
+</mapper>
+```
+
+#### REST Controller Pattern
+
+Controllers are named `*RestResource` (not `*Controller`). Each bounded context typically has separate resources for public, tenant-scoped, and admin operations.
 
 ```java
 @RestController
-@RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
-@Tag(name = "User Management")
-public class UserController {
+@RequestMapping("/api/v1/cms/pages")
+@Tag(name = "Public Pages", description = "Endpoints for retrieving published CMS pages (tenant-scoped)")
+public class PageRestResource {
 
-  private final UserService userService;
+  private final PageService pageService;
 
-  @GetMapping("/{id}")
-  @Operation(summary = "Get user by ID")
-  public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
-    return userService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+  public PageRestResource(final PageService pageService) {
+    this.pageService = pageService;
+  }
+
+  @GetMapping("/{slug}")
+  @Operation(summary = "Get page by slug")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Page retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Page not found")
+  })
+  public ResponseEntity<PageDtos.PageResponse> getBySlug(
+      @RequestHeader("X-Tenant-ID") final String tenantKey,
+      @PathVariable final String slug,
+      final Locale resolvedLocale) {
+    try {
+      TenantContext.setCurrentTenant(tenantKey);
+      return ResponseEntity.ok(pageService.getBySlug(slug, resolvedLocale));
+    } finally {
+      TenantContext.clear();  // Always clear tenant context in finally block
+    }
   }
 }
+```
+
+**Important:** Always clear `TenantContext` in a `finally` block after setting it in a controller.
+
+#### Liquibase Migration Patterns
+
+Migrations are split into two separate changelog trees:
+
+- `db/changelog/system/db.changelog-system.xml` — shared/system tables
+- `db/changelog/tenant/db.changelog-tenant.xml` — per-tenant schema tables
+
+When adding a new table that belongs to a tenant's data, add the changeset to the **tenant** changelog. System-level tables (e.g., tenant registry) go in the **system** changelog.
+
+```xml
+<!-- Example tenant migration -->
+<changeSet id="20240801-01" author="developer">
+  <createTable tableName="pages">
+    <column name="id" type="uuid">
+      <constraints primaryKey="true" nullable="false"/>
+    </column>
+    <column name="slug" type="varchar(255)">
+      <constraints nullable="false" unique="true"/>
+    </column>
+    <column name="status" type="varchar(50)">
+      <constraints nullable="false"/>
+    </column>
+    <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+  </createTable>
+</changeSet>
 ```
 
 #### Testing Standards
 
-**Unit Tests - AAA Pattern:**
+**Unit Tests — AAA Pattern:**
 
 ```java
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class PageServiceImplTest {
 
   @Mock
-  private UserRepository userRepository;
+  private PageMapper pageMapper;
 
   @InjectMocks
-  private UserService userService;
+  private PageServiceImpl pageService;
 
   @Test
-  @DisplayName("Should create user successfully")
-  void shouldCreateUser() {
+  @DisplayName("Should throw PageNotFoundException when page does not exist")
+  void shouldThrowWhenPageNotFound() {
     // Arrange
-    var command = new UserCreateCommand("john.doe", "john@example.com");
-    when(userRepository.save(any(User.class))).thenAnswer((i) -> i.getArgument(0));
+    when(pageMapper.findById(any(UUID.class))).thenReturn(Optional.empty());
 
-    // Act
-    var result = userService.createUser(command);
-
-    // Assert
-    assertThat(result.username()).isEqualTo("john.doe");
-    verify(userRepository).save(any(User.class));
+    // Act & Assert
+    assertThrows(PageNotFoundException.class, () -> pageService.getById(UUID.randomUUID()));
   }
 }
 ```
 
-**Integration Tests with Testcontainers:**
+**Integration Tests:**
+
+Use the `@IntegrationTest` composite annotation (wraps `@SpringBootTest`). Testcontainers are available for PostgreSQL and RabbitMQ.
 
 ```java
-@SpringBootTest
+@IntegrationTest
 @Testcontainers
-@ActiveProfiles("test")
-class UserServiceIntegrationTest {
+class PageServiceIntegrationTest {
 
   @Container
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
 
   @DynamicPropertySource
-  static void configureProperties(DynamicPropertyRegistry registry) {
+  static void configureProperties(final DynamicPropertyRegistry registry) {
     registry.add("spring.datasource.url", postgres::getJdbcUrl);
     registry.add("spring.datasource.username", postgres::getUsername);
     registry.add("spring.datasource.password", postgres::getPassword);
   }
 
   @Autowired
-  private UserService userService;
-
-  @Test
-  void shouldCreateAndRetrieveUser() {
-    // Test implementation
-  }
+  private PageService pageService;
 }
 ```
 
-**Architecture Tests with ArchUnit:**
+**Architecture Tests:**
+
+The existing `TechnicalStructureTest` uses `onionArchitecture().withOptionalLayers(true)`. Add new `@ArchTest` rules there — do not create separate architecture test classes.
 
 ```java
-@AnalyzeClasses(packages = "com.example.project")
-class ArchitectureTest {
+@AnalyzeClasses(packagesOf = CmsApplication.class, importOptions = DoNotIncludeTests.class)
+class TechnicalStructureTest {
 
   @ArchTest
-  static final ArchRule servicesOnlyAccessedByControllersOrServices = classes()
-    .that()
-    .resideInAPackage("..service..")
-    .should()
-    .onlyBeAccessed()
-    .byAnyPackage("..controller..", "..service..", "..config..");
-
-  @ArchTest
-  static final ArchRule repositoriesShouldBeInterfaces = classes().that().resideInAPackage("..repository..").should().beInterfaces();
+  static final ArchRule respectsTechnicalArchitectureLayers = onionArchitecture()
+      .withOptionalLayers(true)
+      .ignoreDependency(belongToAnyOf(CmsApplication.class), alwaysTrue());
 }
 ```
+
+**Security Tests:**
+
+```java
+@Test
+@WithMockUser(authorities = "PLATFORM_ADMIN")
+void shouldAllowAdminAccess() throws Exception {
+  mockMvc.perform(get("/api/v1/cms/admin/pages"))
+      .andExpect(status().isOk());
+}
+
+@Test
+@WithMockUser(authorities = "USER")
+void shouldDenyNonAdminToAdminEndpoint() throws Exception {
+  mockMvc.perform(get("/api/v1/cms/admin/pages"))
+      .andExpect(status().isForbidden());
+}
+```
+
+Note: use `authorities` not `roles` — the security config maps JWT `"authorities"` claim directly to `GrantedAuthority`.
 
 ### Maven Command Best Practices for AI Agents
 
-**STRICT RECOMMENDATION: Always use `-Dcheckstyle.skip=true` when running Maven commands during development.**
-
-```yaml
-maven_commands:
-    development_phase:
-        recommended: "mvn clean verify -Dcheckstyle.skip=true"
-        reason: "Focus on functionality and tests without style blocking"
-
-    testing_phase:
-        recommended: "mvn test -Dcheckstyle.skip=true"
-        reason: "Rapid test iteration without style checks"
-
-    style_check_phase:
-        explicit: "mvn checkstyle:check"
-        when: "Before committing or when explicitly requested"
-
-workflow:
-    1. develop: "Implement features with -Dcheckstyle.skip=true"
-    2. test: "Run tests with -Dcheckstyle.skip=true"
-    3. verify: "Ensure functionality works correctly"
-    4. style: "Run mvn checkstyle:check separately"
-    5. fix_style: "Address Checkstyle violations in focused pass"
-    6. commit: "CI/CD enforces Checkstyle automatically"
-
-rationale:
-    - "Checkstyle violations should not block functional development"
-    - "Style issues are better addressed in dedicated cleanup phase"
-    - "CI/CD pipeline enforces style checks before merge"
-    - "Faster iteration cycle for AI-assisted development"
-```
-
-**Example Commands:**
+**STRICT RECOMMENDATION: Always use `-Dcheckstyle.skip=true` during active development.**
 
 ```bash
-# ✅ RECOMMENDED: Development and testing
+# Development and testing
 mvn clean verify -Dcheckstyle.skip=true
 mvn test -Dcheckstyle.skip=true
-mvn clean install -Dcheckstyle.skip=true
 
-# ✅ RECOMMENDED: Explicit style check when ready
+# Enable coverage explicitly (skipped by default)
+mvn verify -Dcheckstyle.skip=true -Djacoco.skip=false
+mvn jacoco:report -Djacoco.skip=false
+# View: target/site/jacoco/index.html
+
+# Style check when ready
 mvn checkstyle:check
 
-# ❌ NOT RECOMMENDED: Running verify without skip during active development
-mvn clean verify  # May fail due to style issues, blocking progress
+# Architecture tests only
+mvn test -Dtest=TechnicalStructureTest -Dcheckstyle.skip=true
+
+# Full quality gate
+mvn clean verify
+```
+
+```yaml
+workflow:
+    1. develop: "Implement with -Dcheckstyle.skip=true"
+    2. test: "Run tests with -Dcheckstyle.skip=true"
+    3. style: "Run mvn checkstyle:check separately before committing"
+    4. commit: "CI/CD enforces Checkstyle automatically"
+
+rationale:
+    - "Checkstyle violations block build; skip during iteration"
+    - "jacoco.skip=true is the default — explicitly opt-in to coverage"
+    - "CI/CD enforces all quality gates before merge"
 ```
 
 ## 🔄 Workflow Management
@@ -582,16 +572,13 @@ mvn clean verify  # May fail due to style issues, blocking progress
 
 #### PR Title Format
 
-PR titles must follow Conventional Commits format:
-
 ```
 type(scope): description
 
 Examples:
-feat(auth): add JWT authentication
-fix(user): resolve null pointer exception
-docs(readme): update installation guide
-refactor(service): extract validation logic
+feat(page): add slug-based page retrieval with locale fallback
+fix(tenancy): resolve tenant context leak on request error
+improvement(page): add pagination to admin page list
 ```
 
 #### PR Description Template
@@ -633,13 +620,14 @@ Brief description of changes and motivation.
 - [ ] Self-review completed
 - [ ] Tests cover new/modified code
 - [ ] All tests pass locally
-- [ ] Documentation updated
+- [ ] Tenant context always cleared in `finally` blocks
 
 ## Security Considerations
 
 - [ ] No sensitive data in logs
 - [ ] Input validation implemented
-- [ ] Authorization checks in place
+- [ ] Authorization authority strings match JWT claim values (not role prefixes)
+- [ ] Tenant scoping enforced for all data access
 
 ## Additional Notes
 ```
@@ -650,7 +638,7 @@ Brief description of changes and motivation.
 
 - ✅ All tests pass
 - ✅ Checkstyle validation passes
-- ✅ Code coverage meets minimum threshold
+- ✅ Code coverage meets 60% minimum
 - ✅ Commit messages follow Conventional Commits
 - ✅ No merge conflicts
 
@@ -659,24 +647,29 @@ Brief description of changes and motivation.
 ```yaml
 review_checklist:
     code_quality:
-        - Modern Java features used appropriately
-        - Proper exception handling
-        - No code duplication
+        - Modern Java features used (records, pattern matching, var)
+        - Explicit constructor injection (no @Autowired, no @RequiredArgsConstructor)
+        - No code duplication; DTOs grouped as nested records in *Dtos class
+
+    tenancy:
+        - TenantContext.setCurrentTenant() always paired with TenantContext.clear() in finally
+        - New tables added to the correct changelog (system vs tenant)
+        - Multi-tenant queries scoped correctly
 
     security:
-        - Input validation with @Valid
-        - No SQL injection vulnerabilities
-        - No sensitive data exposure
+        - Authority strings match actual JWT claim values (e.g., PLATFORM_ADMIN not ROLE_ADMIN)
+        - New endpoints explicitly configured in SecurityConfig
+        - No sensitive data logged
+
+    persistence:
+        - MyBatis mapper XML added for new mapper methods
+        - UUIDs used as primary keys (not Long/int)
+        - underscore_case column names (auto-mapped to camelCase)
 
     testing:
         - AAA pattern in unit tests
-        - Edge cases covered
-        - Integration tests for critical paths
-
-    documentation:
-        - OpenAPI annotations on endpoints
-        - Complex logic documented
-        - README updated if needed
+        - @IntegrationTest for Spring context tests
+        - Testcontainers used for PostgreSQL/RabbitMQ integration tests
 ```
 
 ## 🔒 Security Guidelines
@@ -685,49 +678,51 @@ review_checklist:
 
 ```yaml
 authentication:
-  - [ ] Secure authentication mechanism implemented
-  - [ ] Password hashing (BCrypt or similar)
-  - [ ] Token expiration configured
-  - [ ] Account lockout protection
+  - [ ] Service acts as OAuth2 Resource Server (not auth server — no login/register)
+  - [ ] RSA public key file present in keys/public.pem
+  - [ ] JWT public key path configured via JWT_PUBLIC_KEY_PATH env var in production
 
 authorization:
-  - [ ] Role-based access control
-  - [ ] Method-level security with @PreAuthorize
-  - [ ] User can only access own data
+  - [ ] Authority strings in @PreAuthorize match JWT "authorities" claim values exactly
+  - [ ] New endpoints added to SecurityConfig.securityFilterChain()
+  - [ ] PLATFORM_ADMIN for cross-tenant admin operations
+  - [ ] TENANT_OWNER / ADMIN for tenant-scoped management operations
 
 input_validation:
-  - [ ] Bean Validation annotations (@Valid, @NotBlank)
-  - [ ] SQL injection prevention (parameterized queries)
-  - [ ] XSS prevention
-  - [ ] Request size limits configured
+  - [ ] Bean Validation annotations on request DTOs (@NotBlank, @Valid, etc.)
+  - [ ] MyBatis parameterized queries — no string concatenation in SQL
+  - [ ] Tenant key validated before setting on TenantContext
 
 data_protection:
-  - [ ] Passwords never logged
-  - [ ] Sensitive data encrypted
-  - [ ] HTTPS enforced in production
-  - [ ] Secure headers configured
+  - [ ] No secrets logged (passwords, tokens, keys)
+  - [ ] Environment variables for all secrets (DB_PASSWORD, RABBITMQ_PASSWORD, etc.)
+  - [ ] .env files gitignored
+  - [ ] Tenant data strictly isolated at query level
 
 secrets_management:
-  - [ ] No hardcoded secrets
-  - [ ] Environment variables for configuration
-  - [ ] .env files gitignored
+  - [ ] No hardcoded credentials in source code or config files
+  - [ ] application-prd.yml references only env var placeholders
+  - [ ] JWT public key loaded from configurable path, not hardcoded
 ```
 
-### Security Testing
+### Environment Variables Reference
 
-```java
-@Test
-void shouldRejectInvalidToken() {
-  var invalidToken = "invalid.token";
-  assertThrows(AuthenticationException.class, () -> authService.validateToken(invalidToken));
-}
-
-@Test
-@WithMockUser(roles = "USER")
-void shouldDenyAccessToAdminEndpoint() throws Exception {
-  mockMvc.perform(get("/api/v1/iam/admin/users")).andExpect(status().isForbidden());
-}
-```
+| Variable              | Default (local)                     | Description                          |
+| --------------------- | ----------------------------------- | ------------------------------------ |
+| `DB_HOST`             | `localhost`                         | PostgreSQL host                      |
+| `DB_PORT`             | `5432`                              | PostgreSQL port                      |
+| `DB_NAME`             | `cmsservice`                        | Database name                        |
+| `DB_USERNAME`         | `svc_cms_dba`                       | Database user                        |
+| `DB_PASSWORD`         | `svc_cms_dba`                       | Database password                    |
+| `RABBITMQ_HOST`       | `localhost`                         | RabbitMQ host                        |
+| `RABBITMQ_PORT`       | `5672`                              | RabbitMQ port                        |
+| `RABBITMQ_USERNAME`   | `svc_cms_rmq`                       | RabbitMQ user                        |
+| `RABBITMQ_PASSWORD`   | `svc_cms_rmq`                       | RabbitMQ password                    |
+| `JWT_PUBLIC_KEY_PATH` | `classpath:keys/public.pem`         | RSA public key location              |
+| `ROLLOUT_MODE`        | `MULTI_TENANT`                      | `MULTI_TENANT` or `SINGLE_TENANT`    |
+| `DEFAULT_TENANT_KEY`  | `platform`                          | Used only in `SINGLE_TENANT` mode    |
+| `DEFAULT_TENANT_NAME` | `Acme Corp.`                        | Display name in `SINGLE_TENANT` mode |
+| `BILLING_SERVICE_URI` | `http://foundation-billing-service` | Billing service base URL             |
 
 ## 📊 Quality Assurance
 
@@ -736,43 +731,54 @@ void shouldDenyAccessToAdminEndpoint() throws Exception {
 ```yaml
 test_coverage:
     minimum_threshold: ">= 60%"
-    target: ">= 80%"
+    excluded: "**/*Application.class"
+    note: "jacoco.skip=true by default; run with -Djacoco.skip=false to generate report"
 
 code_style:
-    tool: "Checkstyle"
-    enforcement: "Maven build fails on violations"
+    tool: "Checkstyle (via parent POM configuration)"
+    enforcement: "Build fails on violations"
+    skip_flag: "-Dcheckstyle.skip=true"
 
 architecture:
     tool: "ArchUnit"
-    rules:
-        - "Services only accessed by controllers"
-        - "No cyclic dependencies"
-        - "Proper package structure"
+    test_class: "TechnicalStructureTest"
+    rule: "onionArchitecture().withOptionalLayers(true)"
 ```
 
-### Quality Gates
+### Local Development Setup
+
+Start required infrastructure:
 
 ```bash
-# Run all quality checks locally
-mvn clean verify
-
-# Run only tests
-mvn test
-
-# Check code coverage
-mvn jacoco:report
-# View: target/site/jacoco/index.html
-
-# Check code style
-mvn checkstyle:check
-
-# Run architecture tests
-mvn test -Dtest=*ArchitectureTest
+docker compose up postgres-cms rabbitmq-cms
 ```
+
+Then run the app with the `local` profile:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+The `local` profile enables:
+
+- Liquibase with `demo` context (seeds demo tenants: `platform`, `acme0001`, `demo0001`)
+- All actuator endpoints exposed
+- DEBUG logging for `com.iqkv` and MyBatis
+- RabbitMQ messaging enabled
+
+### Application Profiles
+
+| Profile     | Purpose                                                       |
+| ----------- | ------------------------------------------------------------- |
+| _(default)_ | Base config, Liquibase disabled, messaging disabled           |
+| `local`     | Local dev with Docker Compose infra, demo data, full actuator |
+| `sit`       | System integration testing                                    |
+| `uat`       | User acceptance testing                                       |
+| `prd`       | Production                                                    |
 
 ## 🚀 CI/CD Pipeline
 
-### Recommended GitHub Actions Workflow
+No Java CI workflow is currently present in `.github/workflows/` — only a Node.js project workflow exists. When adding a Java CI pipeline, follow this structure:
 
 ```yaml
 name: CI/CD Pipeline
@@ -786,7 +792,6 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
-
         steps:
             - uses: actions/checkout@v4
 
@@ -798,7 +803,7 @@ jobs:
                   cache: "maven"
 
             - name: Build and Test
-              run: mvn clean verify
+              run: mvn clean verify -Djacoco.skip=false
 
             - name: Upload Coverage
               uses: codecov/codecov-action@v3
@@ -810,35 +815,43 @@ jobs:
 
 ### API Documentation with OpenAPI
 
+All REST controllers must use SpringDoc annotations. Follow the pattern established in `PageRestResource`:
+
 ```java
 @RestController
-@RequestMapping("/api/v1/users")
-@Tag(name = "User Management", description = "User operations")
-public class UserController {
+@RequestMapping("/api/v1/cms/pages")
+@Tag(name = "Public Pages", description = "Tenant-scoped public CMS page endpoints")
+public class PageRestResource {
 
-  @GetMapping("/{id}")
-  @Operation(summary = "Get user by ID", description = "Retrieves a user by their unique identifier")
-  @ApiResponses({ @ApiResponse(responseCode = "200", description = "User found"), @ApiResponse(responseCode = "404", description = "User not found") })
-  public ResponseEntity<UserDto> getUser(@Parameter(description = "User ID", example = "1") @PathVariable Long id) {
-    return userService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-  }
+  @GetMapping("/{slug}")
+  @Operation(
+      summary = "Get page by slug",
+      description = "Retrieves a published page by slug with locale fallback (exact → language → en-US)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Page found"),
+      @ApiResponse(responseCode = "404", description = "Page not found")
+  })
+  public ResponseEntity<PageDtos.PageResponse> getBySlug(
+      @Parameter(description = "8-char tenant key") @RequestHeader("X-Tenant-ID") final String tenantKey,
+      @PathVariable final String slug,
+      final Locale resolvedLocale) { ... }
 }
 ```
 
 ### Code Documentation
 
-**When to Document:**
+Document:
 
-- Complex business logic
+- Complex business logic (e.g., locale fallback chains)
 - Non-obvious algorithms
 - Security-critical code
-- Public APIs
+- Public service interface methods
 
-**When NOT to Document:**
+Do not document:
 
-- Self-explanatory code
-- Simple getters/setters
-- Obvious implementations
+- Self-explanatory getters/setters
+- Obvious wrapper methods
+- Boilerplate constructors
 
 ## 🎯 Agent Decision Framework
 
@@ -848,143 +861,59 @@ public class UserController {
 
 ```yaml
 before_making_changes:
-    1. analyze: "Understand the request and identify required changes"
+    1. analyze: "Read relevant files and understand the request"
     2. explain: "Describe what changes will be made and why"
     3. assess_impact: "Evaluate impact, effort, and risk"
-    4. present_options: "Offer alternatives if applicable"
-    5. wait_for_approval: "STOP and wait for explicit user confirmation"
-    6. apply_changes: "Only after user approves"
-    7. verify: "Confirm changes work as expected"
+    4. wait_for_approval: "STOP and wait for explicit user confirmation"
+    5. apply_changes: "Only after user approves"
+    6. verify: "Run tests; confirm changes work"
 
 exceptions:
     - read_only_operations: "Reading files, searching, analyzing"
     - information_requests: "Answering questions, explaining concepts"
-    - recommendations: "Suggesting approaches without implementing"
 
 never_auto_apply:
     - code_changes: "Any modification to source files"
     - configuration_changes: "application.yml, pom.xml, etc."
     - dependency_updates: "Adding or updating dependencies"
-    - refactoring: "Code restructuring"
-    - deletions: "Removing files or code"
-    - security_changes: "Authentication, authorization, secrets"
-```
-
-### When to Intervene
-
-**High Priority (Immediate Action - Still Requires Approval):**
-
-- 🚨 Security vulnerabilities
-- 🔴 Build failures blocking development
-- 💥 Critical bugs affecting core functionality
-- ⚠️ Authentication/authorization failures
-
-**Medium Priority (Plan and Execute - Requires Approval):**
-
-- 📉 Code quality degradation
-- 🐌 Performance regressions
-- ❌ Test failures
-- 📦 Dependency updates
-
-**Low Priority (Continuous Improvement - Requires Approval):**
-
-- 📝 Documentation gaps
-- ♻️ Refactoring opportunities
-- 🎨 Code style improvements
-- 🧪 Test coverage improvements
-
-### Decision Matrix
-
-```yaml
-impact_assessment:
-    critical: "Service unavailable, data loss risk"
-    high: "Major feature broken, workaround exists"
-    medium: "Minor feature affected"
-    low: "Internal improvement, no user impact"
-
-effort_estimation:
-    small: "< 1 day"
-    medium: "1-3 days"
-    large: "1-2 weeks"
-    xlarge: "> 2 weeks"
-
-risk_evaluation:
-    low: "Well-understood change, easy rollback"
-    medium: "New pattern, tested rollback"
-    high: "Complex change, difficult rollback"
-    critical: "Breaking change, irreversible"
+    - schema_changes: "Liquibase changelog files"
+    - security_changes: "SecurityConfig, JWT config, public keys"
 ```
 
 ### Common Patterns and Solutions
 
 **Pattern: Adding a new REST endpoint**
 
-```java
-// 1. Define DTO
-public record CreateRequest(@NotBlank String name) {}
-
-// 2. Add service method
-@Service
-public class MyService {
-
-  public MyDto create(CreateRequest request) {
-    /* ... */
-  }
-}
-
-// 3. Add controller endpoint
-@RestController
-public class MyController {
-
-  @PostMapping
-  @Operation(summary = "Create resource")
-  public ResponseEntity<MyDto> create(@Valid @RequestBody CreateRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(myService.create(request));
-  }
-}
-
-// 4. Add tests
-@Test
-void shouldCreateResource() {
-  /* ... */
-}
+```
+1. Add method to PageService interface
+2. Implement in PageServiceImpl (with tenant context awareness)
+3. Add mapper method to PageMapper interface
+4. Add SQL query to mappers/page/PageMapper.xml
+5. Add controller method to the appropriate *RestResource class
+6. Update SecurityConfig if the endpoint has new access rules
+7. Add unit test for service method
+8. Run: mvn test -Dcheckstyle.skip=true
+9. Run: mvn checkstyle:check
 ```
 
-**Pattern: Adding database migration (Liquibase)**
+**Pattern: Adding a Liquibase migration**
 
-```xml
-<changeSet id="001" author="developer">
-    <createTable tableName="users">
-        <column name="id" type="bigint" autoIncrement="true">
-            <constraints primaryKey="true"/>
-        </column>
-        <column name="username" type="varchar(100)">
-            <constraints nullable="false" unique="true"/>
-        </column>
-        <column name="created_at" type="timestamp"
-                defaultValueComputed="CURRENT_TIMESTAMP"/>
-    </createTable>
-</changeSet>
+```
+Tenant data table → db/changelog/tenant/
+System/shared table → db/changelog/system/
+Use UUID primary keys, timestamp columns (created_at, updated_at)
+Use underscore_case for column names (auto-mapped to camelCase by MyBatis)
 ```
 
-**Pattern: Adding caching**
+**Pattern: Adding a new bounded context**
 
-```java
-@Service
-public class MyService {
+Follow the flat layout of the existing `page/` context:
 
-  @Cacheable(value = "items", key = "#id")
-  public Optional<ItemDto> findById(Long id) {
-    return repository.findById(id).map(ItemMapper::toDto);
-  }
-
-  @CacheEvict(value = "items", key = "#id")
-  public void delete(Long id) {
-    repository.deleteById(id);
-  }
-}
-```
+- Domain model, service interface, service impl, mapper, REST resources, and DTOs all in `com.iqkv.foundation.cmsservice.<context>/`
+- DTOs grouped as nested records in a single `<Context>Dtos.java` class
+- Mapper XML in `src/main/resources/mappers/<context>/`
+- The ArchUnit onion test validates structure automatically
 
 ---
 
-This document serves as a comprehensive reference for maintaining high-quality, secure, and well-organized Java projects while facilitating effective collaboration between human developers and AI agents.
+This document is authoritative for this repository. When in doubt about a pattern or convention, check the `page/` bounded context as the reference implementation.
