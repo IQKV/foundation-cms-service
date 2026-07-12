@@ -81,7 +81,6 @@ iqkv:
     tenant-runner-enabled: true
     system-change-log: db/changelog/system/db.changelog-system.xml
     tenant-change-log: db/changelog/tenant/db.changelog-tenant.xml
-    demo-tenants: []
   platform:
     # Platform-wide operational mode: MULTI_TENANT (default) or SINGLE_TENANT
     rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}

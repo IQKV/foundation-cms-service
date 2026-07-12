@@ -37,6 +37,3 @@ iqkv:
   messaging:
     rabbitmq:
       enabled: true
-  liquibase:
-    demo-tenants:
-      - platform

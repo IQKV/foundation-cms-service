@@ -23,7 +23,6 @@ iqkv:
     rabbitmq:
       enabled: true
   liquibase:
-    demo-tenants:
-      - platform
+    bootstrap-tenants:
       - acme0001
       - demo0001
