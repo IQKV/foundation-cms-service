@@ -25,10 +25,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.iqkv.foundation.tenancy.TenantKeyProvider;
-import com.iqkv.foundation.tenancy.TenantLiquibaseRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,14 +36,10 @@ import org.springframework.stereotype.Component;
  * {@code information_schema.schemata} for schemas whose names start with the {@code t_} prefix.
  * This avoids any cross-service dependency on the IAM tenant registry.
  *
- * <p>On startup, {@link TenantLiquibaseRunner} will apply any pending Liquibase changesets to
- * each discovered schema, keeping all tenant schemas current after a deployment.
- *
- * <p>This bean is activated only when {@link TenantLiquibaseRunner} is present, ensuring it does
- * not interfere when the runner is disabled.
+ * <p>On startup, {@link com.iqkv.foundation.tenancy.TenantLiquibaseRunner} will apply any pending
+ * Liquibase changesets to each discovered schema, keeping all tenant schemas current after a deployment.
  */
 @Component
-@ConditionalOnBean(TenantLiquibaseRunner.class)
 public class AllTenantsKeyProvider implements TenantKeyProvider {
 
   private static final Logger log = LoggerFactory.getLogger(AllTenantsKeyProvider.class);
