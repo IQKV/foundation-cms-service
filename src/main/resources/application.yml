@@ -86,6 +86,14 @@ iqkv:
     rollout-mode: ${ROLLOUT_MODE:MULTI_TENANT}
   auth:
     jwt:
+      # --- Deployed (K8s) — set JWT_JWKS_URI in Helm values / K8s configmap ---
+      # JWKS URI of the IAM service. Keys are fetched, cached, and refreshed automatically
+      # when a JWT carries an unknown kid — enabling transparent key rotation.
+      # Leave blank (or unset JWT_JWKS_URI) to fall back to public-key-path below.
+      # Example: http://foundation-iam-service/.well-known/jwks.json
+      jwks-uri: ${JWT_JWKS_URI:}
+      # --- Local development and tests — ignored when jwks-uri is set ---
+      # Path to the RSA public key PEM. Accepts classpath: (tests) or file: resources.
       public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
   tenancy:
     # Default tenant key for SINGLE_TENANT mode (optional)

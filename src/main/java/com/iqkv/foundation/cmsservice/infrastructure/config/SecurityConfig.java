@@ -92,12 +92,36 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /**
+   * Builds the JWT decoder based on the active verification strategy.
+   *
+   * <ul>
+   *   <li>When {@code iqkv.auth.jwt.jwks-uri} is set: delegates to the IAM JWKS endpoint.
+   *       Nimbus caches the key set in memory and re-fetches only on an unknown {@code kid},
+   *       so key rotation in IAM is transparent to this service.</li>
+   *   <li>When {@code iqkv.auth.jwt.public-key-path} is set: parses the RSA public key from
+   *       the PEM file once at startup. No network dependency — suitable for local dev and tests.</li>
+   * </ul>
+   *
+   * <p>Exactly one of the two properties must be configured; startup fails with an
+   * {@link IllegalStateException} if both or neither are present (enforced by
+   * {@link AuthConfigurationProperties#validate()}).
+   */
   @Bean
   public JwtDecoder jwtDecoder() {
+    final AuthConfigurationProperties.Jwt jwt = authProps.jwt();
+
+    if (jwt.jwksUri() != null && !jwt.jwksUri().isBlank()) {
+      // Deployed (K8s): fetch public keys from the IAM JWKS endpoint.
+      // Nimbus handles caching and re-fetch on unknown kid automatically.
+      return NimbusJwtDecoder.withJwkSetUri(jwt.jwksUri()).build();
+    }
+
+    // Local dev / tests: parse the RSA public key from a PEM file.
+    // Accepts classpath: resources (test) or file: paths (custom local setups).
     try {
-      final String publicKeyPath = authProps.jwt().publicKeyPath();
       final String pem;
-      try (InputStream is = resourceLoader.getResource(publicKeyPath).getInputStream()) {
+      try (InputStream is = resourceLoader.getResource(jwt.publicKeyPath()).getInputStream()) {
         pem = new String(is.readAllBytes(), StandardCharsets.UTF_8);
       }
       final String stripped = pem
@@ -109,7 +133,7 @@ public class SecurityConfig {
       final RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
       return NimbusJwtDecoder.withPublicKey(publicKey).build();
     } catch (final IOException | java.security.GeneralSecurityException e) {
-      throw new IllegalStateException("Failed to load RSA public key for JWT decoding", e);
+      throw new IllegalStateException("Failed to load RSA public key for JWT decoding from: " + jwt.publicKeyPath(), e);
     }
   }
 
