@@ -137,7 +137,10 @@ services:
       MAIL_REPLY_TO: ""
 
       # Security / JWT
-      JWT_PUBLIC_KEY_PATH: classpath:keys/public.pem
+      # Uses the classpath PEM for local dev — no IAM service dependency.
+      # In K8s, JWT_JWKS_URI is injected by the Helm configmap instead.
+      JWT_PUBLIC_KEY_PATH: "classpath:keys/public.pem"
+      JWT_JWKS_URI: ""
 
       # Platform / Tenancy
       ROLLOUT_MODE: MULTI_TENANT
