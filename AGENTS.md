@@ -226,7 +226,7 @@ Refactored [component] to [improvement]. No behavior changes. Tests pass.
 - JaCoCo minimum coverage: **60%** (enforced in build; `Application.class` excluded)
 - JaCoCo is **skipped by default** (`jacoco.skip=true`); enable explicitly with `-Djacoco.skip=false`
 
-**Internal Libraries (IQKV Foundation)**
+**Internal Libraries (iQKV Foundation)**
 
 - `foundation-entitlement-plan-resolver-mvc` — billing plan quota enforcement
 - `foundation-tenancy` — `TenantContext`, tenant schema routing
