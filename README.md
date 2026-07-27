@@ -1,6 +1,6 @@
 > ## 🤔 What is this service all about?
 >
-> - Content management microservice for the IQ Key Value Platform.
+> - Content management microservice for the iQ Key Value Platform.
 > - Centralized page management with hierarchical content structure and multi-language support (with en-US fallback).
 > - Quick-start documentation
 > - Manage issues with 20+ issue labels.
@@ -8,9 +8,9 @@
 
 ---
 
-# 📄 IQ Key Value CMS Service
+# 📄 iQ Key Value CMS Service
 
-Content management microservice for the IQ Key Value Platform. Provides centralized page management with hierarchical content structure, multi-language support (with en-US fallback), and tenant isolation.
+Content management microservice for the iQ Key Value Platform. Provides centralized page management with hierarchical content structure, multi-language support (with en-US fallback), and tenant isolation.
 
 ## About
 
