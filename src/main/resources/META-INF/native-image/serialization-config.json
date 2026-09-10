@@ -1,0 +1,34 @@
+[
+  {
+    "comment": "Jackson serialization for DTO records used in REST responses/requests",
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$CreatePageRequest"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$UpdatePageRequest"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageTranslationRequest"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageResponse"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageTranslationResponse"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageListResponse"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageSummaryResponse"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageSummaryListResponse"
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageHierarchyItem"
+  },
+  {
+    "comment": "Spring ProblemDetail (RFC 9457) — returned by GlobalExceptionHandler",
+    "name": "org.springframework.http.ProblemDetail"
+  }
+]

@@ -1,0 +1,61 @@
+# =============================================================================
+# GraalVM Native Image build for CMS Service — EXPERIMENTAL
+# =============================================================================
+# Prerequisites:
+#   - CPU must support the same ISA on builder and target host
+#   - Build requires ~6-8 GB RAM (GraalVM native-image is memory-intensive)
+#   - MyBatis dynamic proxies and Liquibase reflection are pre-hinted in
+#     src/main/resources/META-INF/native-image/
+#
+# Build:
+#   docker build -f Dockerfile.native -t iqkv/foundation-cms-service:native .
+#
+# Known limitations to expect on first run:
+#   - Missing reflection hints for Liquibase internals may require additions
+#     to reflect-config.json after inspecting build-time warnings
+#   - MyBatis XML mapper parsing may need additional resource registration
+#   - RabbitMQ AMQP classes may need proxy hints if dynamic proxies are used
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: Build — GraalVM JDK 25 with native-image tool
+# ---------------------------------------------------------------------------
+FROM ghcr.io/graalvm/native-image-community:25 AS builder
+
+# Install Maven (GraalVM image is based on Oracle Linux)
+RUN microdnf install -y maven && microdnf clean all
+
+WORKDIR /app
+
+# Copy pom.xml first for dependency caching
+COPY pom.xml .
+
+# Download dependencies (JVM + AOT compile deps)
+RUN mvn dependency:go-offline -B -Pproduction
+
+# Copy source and native-image hints
+COPY src src
+
+# Run Spring AOT processing + GraalVM native-image compilation
+# -Pproduction activates: spring-boot process-aot + native-maven-plugin compile-no-fork
+RUN mvn -Pproduction -DskipTests -B package
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime — minimal distroless image (no shell, no package manager)
+# Distroless base includes glibc, libssl, zlib — all required by GraalVM binary
+# ---------------------------------------------------------------------------
+FROM gcr.io/distroless/base-debian12
+
+WORKDIR /app
+
+# Copy the compiled native binary
+COPY --from=builder /app/target/cms-service .
+
+# Distroless has no adduser — runs as nonroot (uid 65532) by default
+USER nonroot
+
+EXPOSE 8080
+EXPOSE 8081
+
+# Native binary is a self-contained executable — no JVM needed
+ENTRYPOINT ["/app/cms-service"]

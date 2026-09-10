@@ -1,0 +1,213 @@
+[
+  {
+    "comment": "=== MyBatis domain model — resultMap/resultType targets ===",
+    "name": "com.iqkv.foundation.cmsservice.page.Page",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.PageTranslation",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.PageStatus",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageSummaryRow",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageHierarchyRow",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== MyBatis custom TypeHandler ===",
+    "name": "com.iqkv.foundation.cmsservice.infrastructure.mybatis.UuidTypeHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== @ConfigurationProperties records ===",
+    "name": "com.iqkv.foundation.cmsservice.infrastructure.config.TenancyConfigurationProperties",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.infrastructure.config.AuthConfigurationProperties",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.infrastructure.config.AuthConfigurationProperties$Jwt",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== RolloutMode enum ===",
+    "name": "com.iqkv.foundation.cmsservice.infrastructure.config.RolloutMode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== DTO records (Jackson serialization + deserialization) ===",
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$CreatePageRequest",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$UpdatePageRequest",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageTranslationRequest",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageTranslationResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageListResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageSummaryResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageSummaryListResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.iqkv.foundation.cmsservice.page.dto.PageDtos$PageHierarchyItem",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== MyBatis internals — needed for SqlSessionFactory and mapper proxy wiring ===",
+    "name": "org.apache.ibatis.session.Configuration",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.binding.MapperProxy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.binding.MapperProxyFactory",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.mapping.ResultMap",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.mapping.ResultMapping",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.type.BaseTypeHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.ibatis.type.UnknownTypeHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "=== Liquibase internals ===",
+    "name": "liquibase.database.core.PostgresDatabase",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.change.core.CreateTableChange",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.change.core.InsertDataChange",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.change.core.AddColumnChange",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.change.core.AddForeignKeyConstraintChange",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.change.core.CreateIndexChange",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.changelog.ChangeSet",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "liquibase.parser.core.xml.XMLChangeLogSAXParser",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  }
+]

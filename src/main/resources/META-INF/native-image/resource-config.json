@@ -1,0 +1,25 @@
+{
+  "comment": "Resources that must be included in the native image at build time",
+  "resources": {
+    "includes": [
+      { "comment": "Spring Boot application config", "pattern": "application\\.yml" },
+      { "comment": "Spring profile configs", "pattern": "application-.*\\.yml" },
+      { "comment": "Logback config", "pattern": "logback-spring\\.xml" },
+      { "comment": "Banner", "pattern": "banner\\.txt" },
+      { "comment": "RSA public key for JWT verification", "pattern": "keys/public\\.pem" },
+      { "comment": "i18n message bundles", "pattern": "i18n/messages.*\\.properties" },
+      { "comment": "MyBatis XML mapper files", "pattern": "mappers/.*\\.xml" },
+      { "comment": "Liquibase master changelog — system", "pattern": "db/changelog/system/db\\.changelog-system\\.xml" },
+      { "comment": "Liquibase master changelog — tenant", "pattern": "db/changelog/tenant/db\\.changelog-tenant\\.xml" },
+      { "comment": "Liquibase migration scripts", "pattern": "db/changelog/.*\\.xml" },
+      { "comment": "Liquibase schema snapshots (if any)", "pattern": "db/changelog/.*\\.yaml" },
+      { "comment": "Spring auto-configuration imports", "pattern": "META-INF/spring/org\\.springframework\\.boot\\.autoconfigure\\.AutoConfiguration\\.imports" },
+      { "comment": "Spring factories (legacy)", "pattern": "META-INF/spring\\.factories" },
+      { "comment": "Git commit info (actuator /info)", "pattern": "git\\.properties" },
+      { "comment": "Build info (actuator /info)", "pattern": "META-INF/build-info\\.properties" }
+    ]
+  },
+  "bundles": [
+    { "name": "messages" }
+  ]
+}
