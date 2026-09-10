@@ -181,6 +181,71 @@
         </profile>
         <profile>
             <id>production</id>
+            <build>
+                <plugins>
+                    <!-- Enable Spring AOT processing for GraalVM native image -->
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>${start-class}</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>process-aot</id>
+                                <goals>
+                                    <goal>process-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- GraalVM native-image compilation -->
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>cms-service</imageName>
+                            <mainClass>${start-class}</mainClass>
+                            <buildArgs>
+                                <!-- Include pre-written hints from META-INF/native-image -->
+                                <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                                <buildArg>-H:DynamicProxyConfigurationFiles=src/main/resources/META-INF/native-image/proxy-config.json</buildArg>
+                                <buildArg>-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json</buildArg>
+                                <buildArg>-H:SerializationConfigurationFiles=src/main/resources/META-INF/native-image/serialization-config.json</buildArg>
+                                <!-- Enable all security services (needed for JWT / Spring Security) -->
+                                <buildArg>--enable-all-security-services</buildArg>
+                                <!-- Report unsupported elements at runtime rather than build time (safer for experiments) -->
+                                <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                                <!-- Initialize Spring at build time -->
+                                <buildArg>--initialize-at-build-time=org.slf4j,ch.qos.logback,org.apache.commons.logging</buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                    <!-- Compiler: enable AOT-generated sources -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <release>${java.version}</release>
+                            <parameters>true</parameters>
+                            <compilerArgs>
+                                <arg>-Aspring.native.mode=proxy</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>use-qulice</id>
