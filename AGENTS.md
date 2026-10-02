@@ -113,10 +113,11 @@ Format: `type(scope): subject`
 - Types: `feat`, `fix`, `improvement`, `refactor`, `docs`, `test`, `chore`, `ci`, `perf`, `revert`
 - Scope: affected context or layer (e.g., `page`, `security`, `config`, `messaging`, `persistence`)
 - For `fix`: describe the symptom and trigger, not the code change
-  - ✅ `fix(page): draft pages visible to unauthenticated users when tenant cache stale`
-  - ❌ `fix(page): add auth check in page query`
+    - ✅ `fix(page): draft pages visible to unauthenticated users when tenant cache stale`
+    - ❌ `fix(page): add auth check in page query`
 
 Examples:
+
 - `feat(page): add bulk publish endpoint for admin`
 - `fix(messaging): tenant provisioning consumer silently drops malformed events`
 - `refactor(security): extract JWT claim extraction into shared utility`
