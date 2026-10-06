@@ -4,8 +4,13 @@
 -- Create additional schemas
 CREATE SCHEMA IF NOT EXISTS cmsservice;
 
+-- Default tenant schema pre-provisioned for SINGLE_TENANT mode and demo data
+CREATE SCHEMA IF NOT EXISTS t_platform;
+CREATE SCHEMA IF NOT EXISTS t_demo0001;
+CREATE SCHEMA IF NOT EXISTS t_acme0001;
+
 -- Set default search path
-ALTER DATABASE cmsservice SET search_path TO public, cmsservice;
+ALTER DATABASE cmsservice SET search_path TO t_platform, cmsservice, public;
 
 -- Create extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
