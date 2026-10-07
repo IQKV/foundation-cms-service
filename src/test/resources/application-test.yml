@@ -11,11 +11,11 @@ spring:
     password: ""
     driver-class-name: org.h2.Driver
   liquibase:
-    enabled: false  # Migrations are handled by TenantLiquibaseRunner; Spring auto-config must stay off to avoid conflicts
+    enabled: false # Migrations are handled by TenantLiquibaseRunner; Spring auto-config must stay off to avoid conflicts
 
 iqkv:
   liquibase:
-    tenant-runner-enabled: false  # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
+    tenant-runner-enabled: false # Disables TenantLiquibaseRunner on startup; tests manage schema setup themselves
   messaging:
     rabbitmq:
       enabled: false
