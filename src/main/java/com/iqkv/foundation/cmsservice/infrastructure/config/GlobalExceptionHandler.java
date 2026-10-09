@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import com.iqkv.foundation.cmsservice.shared.exception.InvalidPlatformModeException;
 import com.iqkv.foundation.cmsservice.shared.exception.PageNotFoundException;
+import com.iqkv.foundation.entitlement.plan.BillingServiceException;
 import com.iqkv.foundation.entitlement.plan.PlanFeatureNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,18 @@ public class GlobalExceptionHandler {
         ex.getMessage(), request);
     pd.setProperty("featureCode", ex.getFeatureCode());
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  @ExceptionHandler(BillingServiceException.class)
+  public ResponseEntity<ProblemDetail> handleBillingServiceError(final BillingServiceException ex,
+                                                                 final HttpServletRequest request) {
+    log.error("Billing service error: status={}, detail={}", ex.getHttpStatus(), ex.getDetail());
+    final ProblemDetail pd = problem("about:blank", "Upstream Service Error", 502,
+        ex.getDetail(), request);
+    pd.setProperty("upstreamService", "foundation-billing-service");
+    pd.setProperty("upstreamStatus", ex.getHttpStatus().value());
+    ex.getProperties().forEach(pd::setProperty);
+    return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(pd);
   }
 
   // Validation exceptions
