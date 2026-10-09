@@ -21,10 +21,14 @@ import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.UUID;
 
+import com.iqkv.foundation.cmsservice.shared.exception.InvalidPlatformModeException;
+import com.iqkv.foundation.cmsservice.shared.exception.PageNotFoundException;
 import com.iqkv.foundation.entitlement.plan.PlanFeatureNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +38,13 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -61,6 +67,40 @@ public class GlobalExceptionHandler {
     return pd;
   }
 
+  // Domain exceptions
+
+  @ExceptionHandler(PageNotFoundException.class)
+  public ResponseEntity<ProblemDetail> handlePageNotFound(final PageNotFoundException ex,
+                                                          final HttpServletRequest request) {
+    log.debug("Page not found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Not Found", 404,
+        ex.getMessage(), request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
+  }
+
+  @ExceptionHandler(InvalidPlatformModeException.class)
+  public ResponseEntity<ProblemDetail> handleInvalidPlatformMode(final InvalidPlatformModeException ex,
+                                                                  final HttpServletRequest request) {
+    log.error("Invalid platform mode configuration: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Service Misconfigured", 500,
+        "Service is not correctly configured. Contact the platform administrator.", request);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
+  }
+
+  // Entitlement exceptions
+
+  @ExceptionHandler(PlanFeatureNotAvailableException.class)
+  public ResponseEntity<ProblemDetail> handlePlanFeatureNotAvailable(final PlanFeatureNotAvailableException ex,
+                                                                     final HttpServletRequest request) {
+    log.warn("Plan feature not available: featureCode={}, planMessage={}", ex.getFeatureCode(), ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Plan upgrade required", 403,
+        ex.getMessage(), request);
+    pd.setProperty("featureCode", ex.getFeatureCode());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+  }
+
+  // Validation exceptions
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ProblemDetail> handleValidation(final MethodArgumentNotValidException ex,
                                                         final HttpServletRequest request) {
@@ -78,6 +118,35 @@ public class GlobalExceptionHandler {
         ex.getMessage(), request);
     return ResponseEntity.badRequest().body(pd);
   }
+
+  @ExceptionHandler(MissingRequestHeaderException.class)
+  public ResponseEntity<ProblemDetail> handleMissingHeader(final MissingRequestHeaderException ex,
+                                                           final HttpServletRequest request) {
+    log.warn("Missing required header: {}", ex.getHeaderName());
+    final ProblemDetail pd = problem("about:blank", "Bad Request", 400,
+        "Required request header '" + ex.getHeaderName() + "' is missing", request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<ProblemDetail> handleMissingParameter(final MissingServletRequestParameterException ex,
+                                                              final HttpServletRequest request) {
+    log.warn("Missing parameter: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Bad Request", 400,
+        ex.getMessage(), request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ProblemDetail> handleTypeMismatch(final MethodArgumentTypeMismatchException ex,
+                                                          final HttpServletRequest request) {
+    log.warn("Type mismatch: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Bad Request", 400,
+        ex.getMessage(), request);
+    return ResponseEntity.badRequest().body(pd);
+  }
+
+  // Security exceptions
 
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<ProblemDetail> handleAuthentication(final AuthenticationException ex,
@@ -97,15 +166,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
   }
 
-  @ExceptionHandler(PlanFeatureNotAvailableException.class)
-  public ResponseEntity<ProblemDetail> handlePlanFeatureNotAvailable(final PlanFeatureNotAvailableException ex,
-                                                                     final HttpServletRequest request) {
-    log.warn("Plan feature not available: featureCode={}, planMessage={}", ex.getFeatureCode(), ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Plan upgrade required", 403,
-        ex.getMessage(), request);
-    pd.setProperty("featureCode", ex.getFeatureCode());
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
-  }
+  // HTTP / routing exceptions
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ProblemDetail> handleMethodNotSupported(final HttpRequestMethodNotSupportedException ex,
@@ -134,24 +195,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(pd);
   }
 
-  @ExceptionHandler(MissingServletRequestParameterException.class)
-  public ResponseEntity<ProblemDetail> handleMissingParameter(final MissingServletRequestParameterException ex,
-                                                              final HttpServletRequest request) {
-    log.warn("Missing parameter: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Bad Request", 400,
-        ex.getMessage(), request);
-    return ResponseEntity.badRequest().body(pd);
-  }
-
-  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<ProblemDetail> handleTypeMismatch(final MethodArgumentTypeMismatchException ex,
-                                                          final HttpServletRequest request) {
-    log.warn("Type mismatch: {}", ex.getMessage());
-    final ProblemDetail pd = problem("about:blank", "Bad Request", 400,
-        ex.getMessage(), request);
-    return ResponseEntity.badRequest().body(pd);
-  }
-
   @ExceptionHandler(NoHandlerFoundException.class)
   public ResponseEntity<ProblemDetail> handleNoHandlerFound(final NoHandlerFoundException ex,
                                                             final HttpServletRequest request) {
@@ -160,6 +203,37 @@ public class GlobalExceptionHandler {
         "No resource found at " + request.getRequestURI(), request);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ProblemDetail> handleNoResourceFound(final NoResourceFoundException ex,
+                                                             final HttpServletRequest request) {
+    log.debug("No static resource found: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Not Found", 404,
+        "No resource found at " + request.getRequestURI(), request);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
+  }
+
+  // Persistence exceptions
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(final DataIntegrityViolationException ex,
+                                                                    final HttpServletRequest request) {
+    log.warn("Data integrity violation: {}", ex.getMessage());
+    final ProblemDetail pd = problem("about:blank", "Conflict", 409,
+        "The request conflicts with existing data", request);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
+  }
+
+  @ExceptionHandler(DataAccessException.class)
+  public ResponseEntity<ProblemDetail> handleDataAccess(final DataAccessException ex,
+                                                        final HttpServletRequest request) {
+    log.error("Data access error: {}", ex.getMessage(), ex);
+    final ProblemDetail pd = problem("about:blank", "Service Unavailable", 503,
+        "A database error occurred. Please try again later.", request);
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(pd);
+  }
+
+  // Catch-all
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ProblemDetail> handleGeneral(final Exception ex,
