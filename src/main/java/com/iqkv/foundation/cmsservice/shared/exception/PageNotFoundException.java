@@ -18,7 +18,7 @@ package com.iqkv.foundation.cmsservice.shared.exception;
 
 import java.util.UUID;
 
-public class PageNotFoundException extends RuntimeException {
+public class PageNotFoundException extends ResourceNotFoundException {
   public PageNotFoundException(final UUID id) {
     super("Page not found: " + id);
   }
