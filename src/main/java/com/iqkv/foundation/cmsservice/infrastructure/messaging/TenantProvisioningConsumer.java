@@ -28,12 +28,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Provisions the CMS service schema for a newly created tenant.
+ * Provisions the CMS service schema for a newly created or updated tenant.
  *
- * <p>Listens on {@code iqkv.cms.tenant.provisioning} for {@code tenant.created} events
- * published by the IAM service and runs Liquibase tenant migrations against the CMS database.
- * Schema provisioning is independent of IAM — this service does not update tenant status or
- * publish outcome events; those are exclusively IAM's responsibility.
+ * <p>Listens on {@code iqkv.cms.tenant.provisioning} for {@code tenant.created} and
+ * {@code tenant.updated} events published by the IAM service and runs Liquibase tenant
+ * migrations against the CMS database. Migrations are idempotent, so replaying them on an
+ * update is safe. Schema provisioning is independent of IAM — this service does not update
+ * tenant status or publish outcome events; those are exclusively IAM's responsibility.
+ *
+ * <p>The event is consumed as a {@code Map} on purpose: the upstream tenant event class lives in
+ * the IAM module and is not on this service's classpath. This only works because Spring AMQP's
+ * message converter defaults to {@code TypePrecedence.INFERRED} and falls back to the listener's
+ * declared parameter type. Do not switch the type precedence to {@code TYPE_ID}, or
+ * deserialization will fail here.
  */
 @Component
 @ConditionalOnProperty(name = "iqkv.messaging.rabbitmq.enabled", havingValue = "true")
@@ -62,7 +69,8 @@ public class TenantProvisioningConsumer {
       log.info("CMS schema provisioning succeeded: tenantKey={}", tenantKey);
     } catch (final Exception e) {
       log.error("CMS schema provisioning failed: tenantKey={}", tenantKey, e);
-      // Rethrow so the message is nacked and routed to the DLQ for redelivery / inspection.
+      // Rethrow so the delivery is rejected; requeue-on-reject is disabled and the retry
+      // policy is bounded, so the message ends up in CMS_DLQ instead of looping.
       throw new RuntimeException("CMS schema provisioning failed for tenantKey=" + tenantKey, e);
     }
   }
