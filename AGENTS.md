@@ -32,8 +32,6 @@ foundation-cms-service/
 │   │   │       │   │   └── JwtClaimNames.java
 │   │   │       │   ├── messaging/
 │   │   │       │   │   └── TenantProvisioningConsumer.java
-│   │   │       │   ├── mybatis/
-│   │   │       │   │   └── UuidTypeHandler.java
 │   │   │       │   └── persistence/
 │   │   │       ├── page/                         # CMS page bounded context (flat layout)
 │   │   │       │   ├── Page.java                 # Domain model
