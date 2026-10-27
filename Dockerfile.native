@@ -46,6 +46,12 @@ RUN mvn -Pproduction -DskipTests -B package
 # ---------------------------------------------------------------------------
 FROM gcr.io/distroless/base-debian12
 
+# Injected by CI as --build-arg (commit SHA / branch-or-tag).
+ARG VCS_REFERENCE
+ARG BUILD_VERSION_REFERENCE
+ENV APPLICATION_VCS_REFERENCE=${VCS_REFERENCE}
+ENV APPLICATION_BUILD_VERSION=${BUILD_VERSION_REFERENCE}
+
 WORKDIR /app
 
 # Copy the compiled native binary
