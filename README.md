@@ -67,7 +67,7 @@ The CMS service publishes content lifecycle events to RabbitMQ for downstream co
 
 ## Tech Stack
 
-- Java 25 / Spring Boot 4.1
+- Java 25 / Spring Boot 4.2
 - MyBatis 3.x (no JPA) + PostgreSQL 17
 - Liquibase for schema migrations
 - RabbitMQ for async event publishing
